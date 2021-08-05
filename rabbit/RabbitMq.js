@@ -10,13 +10,11 @@ class RabbitMq {
     initServer(callback) {
         this.createConnection((err, connection) => {
             if (err) {
-                console.log('Error while connection to RabbitMq: ', err);
                 callback(err);
             } else {
                 this.connection = connection;
                 this.createChannel(connection, (error, channel) => {
                     if (error) {
-                        console.log('Error while creating RabbitMq channel', error);
                         callback(error);
                     } else {
                         this.channel = channel;
@@ -30,7 +28,6 @@ class RabbitMq {
     createConnection(callback){
         amqp.connect(config.rabbitMqConnectionString, (error, connection) => {
             if (error) {
-                console.log('connection error: ', error);
                 callback(error);
             }else{
                 callback(null, connection);

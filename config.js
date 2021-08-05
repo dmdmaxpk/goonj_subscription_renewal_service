@@ -24,6 +24,10 @@ const codes = {
     code_otp_not_found: 17
 }
 
+const tp_billing_cycle_hours = [1,4,7,10,13,16,19,22];
+const ep_billing_cycle_hours = [9,15,21];
+
+
 const servicesUrls = {
     user_service: 'http://localhost:3007',
     tp_ep_core_service: 'http://localhost:3001',
@@ -41,28 +45,34 @@ const queueNames = {
 
 let config = {
     development: {
-        port: 3004,
+        port: 3005,
         mongo_connection_url: `mongodb://localhost:27017/${db_name}`,
         queueNames: queueNames,
         codes: codes,
         servicesUrls: servicesUrls,
-        rabbitMqConnectionString: rabbitMqConnectionString
+        rabbitMqConnectionString: rabbitMqConnectionString,
+        tp_billing_cycle_hours: tp_billing_cycle_hours,
+        ep_billing_cycle_hours: ep_billing_cycle_hours
     },
     staging: {
-        port: 3004,
+        port: 3005,
         mongo_connection_url: `mongodb://localhost:27017/${db_name}`,
         queueNames: queueNames,
         codes: codes,
         servicesUrls: servicesUrls,
-        rabbitMqConnectionString: rabbitMqConnectionString
+        rabbitMqConnectionString: rabbitMqConnectionString,
+        tp_billing_cycle_hours: tp_billing_cycle_hours,
+        ep_billing_cycle_hours: ep_billing_cycle_hours
     },
     production: {
-        port: 3004,
+        port: 3005,
         mongo_connection_url: `mongodb://localhost:27017/${db_name}`,
         queueNames: queueNames,
         codes: codes,
         servicesUrls: servicesUrls,
-        rabbitMqConnectionString: rabbitMqConnectionString
+        rabbitMqConnectionString: rabbitMqConnectionString,
+        tp_billing_cycle_hours: tp_billing_cycle_hours,
+        ep_billing_cycle_hours: ep_billing_cycle_hours
     }
 };
 

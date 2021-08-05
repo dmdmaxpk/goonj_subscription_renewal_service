@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const Subscription = mongoose.model('Subscription');
 const moment = require("moment");
-const Axios = require('axios');
-const config = require('../config');
 class SubscriptionRepository {
 
     async createSubscription (postData)  {
@@ -114,18 +112,11 @@ class SubscriptionRepository {
     async updateSubscription (subscription_id, postData)  {
         const query = { _id: subscription_id };
         postData.last_modified = new Date();
-    
+
         try {
-            const result = await Subscription.updateOne(query, postData);
-            if (result.nModified === 0) {
-                return undefined;
-            } else {
-                let subscription = await this.getSubscription(subscription_id);
-                return subscription;
-            }
+            await Subscription.updateOne(query, postData);
         } catch(error) {
             console.log(error);
-            return error;
         }
     }
 
@@ -213,23 +204,6 @@ class SubscriptionRepository {
             }
         });
     }
-    
-    // async removeNumberAndHistory (msisdn)  {
-    
-    //     let user = await this.userRepo.getUserByMsisdn(msisdn);
-    //     if (user) { 
-    //         let userId = user._id;
-    //         await this.userRepo.deleteUser(userId);
-    //         let subscriber = subscriberRepo.getSubscriber(userId);
-    //         await deleteSubscriber(userId);
-    //         await deleteAllSubscriptions(subscriber._id);
-    //         await this.historyRepo.deleteMany(userId);
-    
-    //         console.log(`The MSISDN ${msisdn} records deleted successfully`);
-    //     } else {
-    //         console.log(`The MSISDN ${msisdn} failed to delete records`);
-    //     }
-    // }
 
     async getSubscriptionsToMark()  {
         let now = moment();

@@ -22,13 +22,10 @@ app.use('/', require('./routes/index'));
 const RabbitMq = require('./rabbit/RabbitMq');
 const rabbitMq = new RabbitMq().getInstance();
 
-const container = require('./configurations/container');
-const subscriptionConsumer = container.resolve("subscriptionConsumer");
-
 // Start Server
 let { port } = config;
 app.listen(port, () => {
-    console.log(`Subscription Service Running On Port ${port}`);
+    console.log(`Subscription Renewal Service Running On Port ${port}`);
     rabbitMq.initServer((error, response) => {
         if(error){
             console.error(error)
@@ -37,13 +34,6 @@ app.listen(port, () => {
             try{
                 // create queues
                 rabbitMq.createQueue(config.queueNames.subscriptionDispatcher);
-                rabbitMq.createQueue(config.queueNames.billingHistoryDispatcher);
-
-                // consume
-                rabbitMq.consumeQueue(config.queueNames.subscriptionDispatcher, async(message) => {
-                    await subscriptionConsumer.consume(JSON.parse(message.content))
-                    rabbitMq.acknowledge(message);
-                });
             }catch(error){
                 console.error(error.message);
             }

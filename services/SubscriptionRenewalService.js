@@ -6,7 +6,7 @@ const config = require('../config');
 const helper = require('../helper/helper');
 const moment = require('moment');
 
-subscriptionRenewal = async() => {
+subscriptionRenewal = async(packages) => {
     try {
         let subscriptions = await subscriptionRepo.getRenewableSubscriptions();
         let subscriptionToRenew = [];
@@ -106,9 +106,10 @@ renewSubscription = async(subscription) => {
         subscriptionRepo.updateSubscription(subscription._id, {queued: true});
         
         let messageObj = {};
-        messageObj.subscription = subscription;
-        messageObj.mcDetails = mcDetails;
+        messageObj.subscription_id = subscription._id;
+        messageObj.mc_details = mcDetails;
         messageObj.transaction_id = transactionId;
+        messageObj.price_point =
 
         rabbitMq.addInQueue(config.queueNames.subscriptionDispatcher, messageObj);
         console.log(subscription._id + 'added in queue');

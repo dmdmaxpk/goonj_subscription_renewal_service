@@ -29,11 +29,7 @@ const ep_billing_cycle_hours = [9,15,21];
 
 
 const servicesUrls = {
-    user_service: 'http://localhost:3007',
-    tp_ep_core_service: 'http://localhost:3001',
-    billing_history_service: 'http://localhost:3008',
-    core_service: 'http://localhost:3000',
-    message_service: 'http://localhost:3003'
+    core_service: 'http://localhost:3000/core/package',
 }
 
 const max_amount_billed_today_for_daily = 5;

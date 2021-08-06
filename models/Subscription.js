@@ -9,6 +9,8 @@ const subscriptionSchema = new Schema({
 
     // subscriber_id: {type: ShortId, required: true},
     user_id: {type: ShortId, required: true},
+    //Todo: move user id to subscriptions
+
     paywall_id: {type: ShortId, required: true},
     subscribed_package_id: {type: ShortId, required: true},
 

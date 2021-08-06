@@ -34,6 +34,7 @@ app.listen(port, () => {
             try{
                 // create queues
                 rabbitMq.createQueue(config.queueNames.subscriptionDispatcher);
+                rabbitMq.createQueue(config.queueNames.emailDispatcher);
             }catch(error){
                 console.error(error.message);
             }

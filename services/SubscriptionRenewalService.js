@@ -3,8 +3,8 @@ const SubscriptionRepository = require('../repos/SubscriptionRepository');
 const subscriptionRepo = new SubscriptionRepository();
 
 const config = require('../config');
+const helper = require('../helper/helper');
 const moment = require('moment');
-
 
 subscriptionRenewal = async() => {
     try {
@@ -18,7 +18,15 @@ subscriptionRenewal = async() => {
             }else {
                 if((subscriptionToRenew[i].subscribed_package_id === 'QDfC' && subscriptionToRenew[i].amount_billed_today > config.max_amount_billed_today_for_daily) || (subscriptionToRenew[i].subscribed_package_id === 'QDfG' && subscriptionToRenew[i].amount_billed_today > config.max_amount_billed_today_for_weekly)){
                     // initiate excessive billing email and do the necessary actions
-                    
+
+
+                    let messageObj = {};
+                    // messageObj.to = ["paywall@dmdmax.com.pk"];
+                    messageObj.to = ["muhammad.azam@dmdmax.com", "farhan.ali@dmdmax.com"];
+                    messageObj.subject = 'Excessive MicroCharing Email';
+                    messageObj.text = `Subscription id ${subscriptions[i]._id} is trying to charge on a price greater than package price.`;
+
+                    helper.sendToQueue(config.queueNames.emailDispatcher, messageObj);
                 }else{
                     subscriptionToRenew = [...subscriptionToRenew, subscriptions[i]];
                 }

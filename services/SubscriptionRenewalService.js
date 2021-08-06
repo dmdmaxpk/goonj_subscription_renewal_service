@@ -16,12 +16,9 @@ subscriptionRenewal = async() => {
             if(subscriptions[i].auto_renewal === false){
                 subscriptionNotToRenew = [...subscriptionNotToRenew, subscriptions[i]];
             }else {
-                if(subscriptionToRenew[i].subscribed_package_id === 'QDfC' && subscriptionToRenew[i].amount_billed_today > config.max_amount_billed_today_for_daily){
+                if((subscriptionToRenew[i].subscribed_package_id === 'QDfC' && subscriptionToRenew[i].amount_billed_today > config.max_amount_billed_today_for_daily) || (subscriptionToRenew[i].subscribed_package_id === 'QDfG' && subscriptionToRenew[i].amount_billed_today > config.max_amount_billed_today_for_weekly)){
                     // initiate excessive billing email and do the necessary actions
                     
-                }else if(subscriptionToRenew[i].subscribed_package_id === 'QDfG' && subscriptionToRenew[i].amount_billed_today > config.max_amount_billed_today_for_weekly){
-                    // initiate excessive billing email and do the necessary actions
-
                 }else{
                     subscriptionToRenew = [...subscriptionToRenew, subscriptions[i]];
                 }

@@ -35,6 +35,10 @@ const servicesUrls = {
     core_service: 'http://localhost:3000',
     message_service: 'http://localhost:3003'
 }
+
+const max_amount_billed_today_for_daily = 5;
+const max_amount_billed_today_for_weekly = 15;
+
 const rabbitMqConnectionString = 'amqp://127.0.0.1';
 const db_name = 'goonjpaywall';
 
@@ -52,7 +56,9 @@ let config = {
         servicesUrls: servicesUrls,
         rabbitMqConnectionString: rabbitMqConnectionString,
         tp_billing_cycle_hours: tp_billing_cycle_hours,
-        ep_billing_cycle_hours: ep_billing_cycle_hours
+        ep_billing_cycle_hours: ep_billing_cycle_hours,
+        max_amount_billed_today_for_daily: max_amount_billed_today_for_daily,
+        max_amount_billed_today_for_weekly: max_amount_billed_today_for_weekly
     },
     staging: {
         port: 3005,
@@ -62,7 +68,9 @@ let config = {
         servicesUrls: servicesUrls,
         rabbitMqConnectionString: rabbitMqConnectionString,
         tp_billing_cycle_hours: tp_billing_cycle_hours,
-        ep_billing_cycle_hours: ep_billing_cycle_hours
+        ep_billing_cycle_hours: ep_billing_cycle_hours,
+        max_amount_billed_today_for_daily: max_amount_billed_today_for_daily,
+        max_amount_billed_today_for_weekly: max_amount_billed_today_for_weekly
     },
     production: {
         port: 3005,
@@ -72,7 +80,9 @@ let config = {
         servicesUrls: servicesUrls,
         rabbitMqConnectionString: rabbitMqConnectionString,
         tp_billing_cycle_hours: tp_billing_cycle_hours,
-        ep_billing_cycle_hours: ep_billing_cycle_hours
+        ep_billing_cycle_hours: ep_billing_cycle_hours,
+        max_amount_billed_today_for_daily: max_amount_billed_today_for_daily,
+        max_amount_billed_today_for_weekly: max_amount_billed_today_for_weekly
     }
 };
 

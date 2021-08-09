@@ -4,6 +4,7 @@ const subscriptionRepo = new SubscriptionRepository();
 
 const config = require('../config');
 const moment = require('moment');
+const lodash = require('lodash');
 
 subscriptionRenewal = async(packages) => {
     try {
@@ -33,7 +34,7 @@ subscriptionRenewal = async(packages) => {
         console.log("Subscribers to renew in this chunk are ", subscriptionToRenew.length);
 
         for(let i = 0; i < subscriptionToRenew.length; i++){
-            promises = [...promises, await renewSubscription(subscriptionToRenew[i])];
+            promises = [...promises, await renewSubscription(subscriptionToRenew[i], packages)];
         }
 
         await Promise.all(promises);
@@ -71,7 +72,7 @@ expire = async(subscription) => {
     await billingHistoryRepo.createBillingHistory(history);
 }
 
-renewSubscription = async(subscription) => {
+renewSubscription = async(subscription, packages) => {
     let transactionId;
     let mcDetails = {};
 
@@ -93,19 +94,33 @@ renewSubscription = async(subscription) => {
     }
 
     // Add object in queueing server
-    if(subscription.queued === false){
+    let user = await axios({method: 'get', url: config.servicesUrls.user_service + subscription.user_id, headers: {'Content-Type': 'application/json' }
+    }).then(function(response){
+        return response.data;
+    }).catch(function(err){
+        console.log(err);
+        return undefined;
+    });
+
+    if(user && subscription.queued === false && subscription.active){
+        let subscribedPackage = lodash.filter(packages, package => package._id === subscription.subscribed_package_id);
         subscriptionRepo.updateSubscription(subscription._id, {queued: true});
-        
+
         let messageObj = {};
         messageObj.subscription_id = subscription._id;
+        messageObj.payment_source = subscription.payment_source;
+        messageObj.ep_token = subscription.ep_token;
         messageObj.mc_details = mcDetails;
         messageObj.transaction_id = transactionId;
-        messageObj.price_point = 
+        messageObj.price_point = subscribedPackage.price_point_pkr
+        messageObj.partner_id = subscribedPackage.partner_id;
+        messageObj.user_id = user._id;
+        messageObj.msisdn = user.msisdn;
 
         rabbitMq.addInQueue(config.queueNames.subscriptionDispatcher, messageObj);
         console.log(subscription._id + 'added in queue');
     }else{
-        console.log("The subscription", subscription._id, " is already queued");
+        console.log(`Either user ${subscription.user_id} does not exist or the subscription ${subscription._id} is not active or the subscription ${subscription._id} is already queued`);
     }
 }
 

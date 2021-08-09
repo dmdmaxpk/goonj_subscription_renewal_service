@@ -29,7 +29,8 @@ const ep_billing_cycle_hours = [9,15,21];
 
 
 const servicesUrls = {
-    core_service: 'http://localhost:3000/core/package',
+    core_service: 'http//localhost:3000/package',
+    user_service: 'http://localhost:3007/user/get_user_by_id?id='
 }
 
 const max_amount_billed_today_for_daily = 5;

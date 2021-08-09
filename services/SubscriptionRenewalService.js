@@ -1,8 +1,8 @@
-
-const SubscriptionRepository = require('../repos/SubscriptionRepository');
-const subscriptionRepo = new SubscriptionRepository();
+const container = require("../configurations/container");
+const subscriptionRepo = container.resolve("subscriptionRepository");
 
 const config = require('../config');
+const helper = require('../helper/helper');
 const moment = require('moment');
 const lodash = require('lodash');
 
@@ -18,7 +18,15 @@ subscriptionRenewal = async(packages) => {
             }else {
                 if((subscriptionToRenew[i].subscribed_package_id === 'QDfC' && subscriptionToRenew[i].amount_billed_today > config.max_amount_billed_today_for_daily) || (subscriptionToRenew[i].subscribed_package_id === 'QDfG' && subscriptionToRenew[i].amount_billed_today > config.max_amount_billed_today_for_weekly)){
                     // initiate excessive billing email and do the necessary actions
-                    
+
+                    let user_id = subscriptionToRenew[i].user_id;
+                    let packageObj = null;
+                    packages.forEach(function(package){
+                        if(package._id === subscriptionToRenew[i].subscribed_package_id) packageObj = package;
+                    });
+
+                    if (packageObj) await logExcessiveBilling(packageObj, user_id, subscriptionToRenew[i]);
+
                 }else{
                     subscriptionToRenew = [...subscriptionToRenew, subscriptions[i]];
                 }
@@ -41,6 +49,32 @@ subscriptionRenewal = async(packages) => {
     } catch(err){
         console.log(err);
     }
+}
+
+logExcessiveBilling = async (packageObj, user_id, subscription) => {
+
+    // Update subscription
+    await subscriptionRepo.updateSubscription(subscription._id, {active:false, queued:false, is_billable_in_this_cycle: false});
+
+    // create billing history history
+    let history = {};
+    history.user_id = user_id;
+    history.package_id = packageObj._id;
+    history.paywall_id = packageObj.paywall_id;
+    history.subscription_id = subscription._id;
+    history.subscriber_id = subscription.subscriber_id;
+    history.transaction_id = subscription.transaction_id;
+    history.operator_response = {"message": `Subscription ${subscription._id} has exceeded their billing limit. Email sent.`};
+    history.billing_status = "billing_exceeded";
+    helper.sendToQueue(config.queueNames.billingHistoryDispatcher, history);
+
+    // Shoot an email
+    let messageObj = {};
+    // messageObj.to = ["paywall@dmdmax.com.pk"];
+    messageObj.to = ["muhammad.azam@dmdmax.com", "farhan.ali@dmdmax.com"]; // for testing
+    messageObj.subject = 'Excessive Charge Email';
+    messageObj.text = `Subscription id ${subscription._id} is trying to charge on a price greater than package price.`;
+    helper.sendToQueue(config.queueNames.emailDispatcher, messageObj);
 }
 
 expire = async(subscription) => {

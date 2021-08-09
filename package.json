@@ -1,8 +1,14 @@
 {
   "name": "goonj_subscription_service",
   "version": "1.0.0",
-  "description": "",
+  "description": "billing renewal service",
   "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "farhan.ali@dmdmax.com",
+  "license": "ISC",
   "dependencies": {
     "amqplib": "^0.8.0",
     "awilix": "^4.3.4",
@@ -13,13 +19,6 @@
     "mongoose": "^5.13.5",
     "mongoose-shortid-nodeps": "^0.6.5",
     "nodemon": "^2.0.12",
-    "shortid": "^2.2.16",
-  },
-  "devDependencies": {},
-  "scripts": {
-    "start": "node app.js --max_old_space_size=4096",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC"
+    "shortid": "^2.2.16"
+  }
 }

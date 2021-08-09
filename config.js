@@ -29,14 +29,14 @@ const ep_billing_cycle_hours = [9,15,21];
 
 
 const servicesUrls = {
-    core_service: 'http//localhost:3000/package',
-    user_service: 'http://localhost:3007/user/get_user_by_id?id='
+    core_service: 'http//10.0.1.21:3000/package',
+    user_service: 'http://10.0.1.21:3007/user/get_user_by_id?id='
 }
 
 const max_amount_billed_today_for_daily = 5;
 const max_amount_billed_today_for_weekly = 15;
 
-const rabbitMqConnectionString = 'amqp://127.0.0.1';
+const rabbitMqConnectionString = 'amqp://10.0.1.21';
 const db_name = 'goonjpaywall';
 
 const queueNames = {
@@ -48,7 +48,7 @@ const queueNames = {
 let config = {
     development: {
         port: 3005,
-        mongo_connection_url: `mongodb://localhost:27017/${db_name}`,
+        mongo_connection_url: `mongodb://10.0.1.21:27017/${db_name}`,
         queueNames: queueNames,
         codes: codes,
         servicesUrls: servicesUrls,
@@ -60,7 +60,7 @@ let config = {
     },
     staging: {
         port: 3005,
-        mongo_connection_url: `mongodb://localhost:27017/${db_name}`,
+        mongo_connection_url: `mongodb://10.0.1.21:27017/${db_name}`,
         queueNames: queueNames,
         codes: codes,
         servicesUrls: servicesUrls,
@@ -72,7 +72,7 @@ let config = {
     },
     production: {
         port: 3005,
-        mongo_connection_url: `mongodb://localhost:27017/${db_name}`,
+        mongo_connection_url: `mongodb://10.0.1.21:27017/${db_name}`,
         queueNames: queueNames,
         codes: codes,
         servicesUrls: servicesUrls,

@@ -14,6 +14,8 @@ const rabbitMq = new RabbitMq().getInstance();
 subscriptionRenewal = async(packages) => {
     try {
         let subscriptions = await subscriptionRepo.getRenewableSubscriptions();
+        console.log('Subscription fetched from database to bill', subscriptions.length);
+
         let subscriptionToRenew = [];
         let subscriptionNotToRenew = [];
 
@@ -29,23 +31,22 @@ subscriptionRenewal = async(packages) => {
                     packages.forEach(function(singlePackage){
                         if(singlePackage._id === subscriptions[i].subscribed_package_id) packageObj = singlePackage;
                     });
-
-                    if (packageObj) await logExcessiveBilling(packageObj, user_id, subscriptions[i]);
-
+                    logExcessiveBilling(packageObj, user_id, subscriptions[i]);
                 }else{
                     subscriptionToRenew = [...subscriptionToRenew, subscriptions[i]];
                 }
             }
         }
         
+        console.warn('Subscription not expire', subscriptionNotToRenew.length);
+        console.warn('Subscription to renew', subscriptionToRenew.length);
+
         for(let i = 0; i < subscriptionNotToRenew.length; i++) {
             let subs = subscriptionNotToRenew[i];
             await expire(subs);
         }
 
         let promises = [];
-        console.log("Subscribers to renew in this chunk are ", subscriptionToRenew.length);
-
         for(let i = 0; i < subscriptionToRenew.length; i++){
             promises = [...promises, await renewSubscription(subscriptionToRenew[i], packages)];
         }
@@ -157,7 +158,7 @@ renewSubscription = async(subscription, packages) => {
         messageObj.msisdn = user.msisdn;
 
         rabbitMq.addInQueue(config.queueNames.subscriptionDispatcher, messageObj);
-        console.log(subscription._id + 'added in queue');
+        console.log(subscription._id, ' added in queue');
     }else{
         console.log(`Either user ${subscription.user_id} does not exist or the subscription ${subscription._id} is not active or the subscription ${subscription._id} is already queued`);
     }

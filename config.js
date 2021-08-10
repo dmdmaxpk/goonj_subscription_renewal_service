@@ -29,7 +29,7 @@ const ep_billing_cycle_hours = [9,15,21];
 
 
 const servicesUrls = {
-    core_service: 'http//10.0.1.21:3000/package',
+    core_service: 'http://10.0.1.21:3000',
     user_service: 'http://10.0.1.21:3007/user/get_user_by_id?id='
 }
 

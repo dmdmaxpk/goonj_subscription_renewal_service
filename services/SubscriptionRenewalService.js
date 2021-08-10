@@ -197,10 +197,12 @@ mark = async(operator) => {
         }
     }
 
-    //Reminders
-    let response = await getMarkUsersPromise(reminders, lastId, operator);
-    console.log("Reminder - ", response);
-    console.log("Subscription marking for current billing cycle completed");
+    if(reminders > 0){
+        //Reminders
+        let response = await getMarkUsersPromise(reminders, lastId, operator);
+        console.log("Reminder - ", response);
+        console.log("Subscription marking for current billing cycle completed");
+    }
 }
 
 float2Int = (float) => {

@@ -3,7 +3,7 @@ const subscriptionRepo = container.resolve("subscriptionRepository");
 
 const config = require('../config');
 const helper = require('../helper/helper');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const lodash = require('lodash');
 
 subscriptionRenewal = async(packages) => {

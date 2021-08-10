@@ -16,16 +16,16 @@ subscriptionRenewal = async(packages) => {
             if(subscriptions[i].auto_renewal === false){
                 subscriptionNotToRenew = [...subscriptionNotToRenew, subscriptions[i]];
             }else {
-                if((subscriptionToRenew[i].subscribed_package_id === 'QDfC' && subscriptionToRenew[i].amount_billed_today > config.max_amount_billed_today_for_daily) || (subscriptionToRenew[i].subscribed_package_id === 'QDfG' && subscriptionToRenew[i].amount_billed_today > config.max_amount_billed_today_for_weekly)){
+                if((subscriptions[i].subscribed_package_id === 'QDfC' && subscriptions[i].amount_billed_today > config.max_amount_billed_today_for_daily) || (subscriptions[i].subscribed_package_id === 'QDfG' && subscriptions[i].amount_billed_today > config.max_amount_billed_today_for_weekly)){
                     // initiate excessive billing email and do the necessary actions
 
-                    let user_id = subscriptionToRenew[i].user_id;
+                    let user_id = subscriptions[i].user_id;
                     let packageObj = null;
-                    packages.forEach(function(package){
-                        if(package._id === subscriptionToRenew[i].subscribed_package_id) packageObj = package;
+                    packages.forEach(function(singlePackage){
+                        if(singlePackage._id === subscriptions[i].subscribed_package_id) packageObj = singlePackage;
                     });
 
-                    if (packageObj) await logExcessiveBilling(packageObj, user_id, subscriptionToRenew[i]);
+                    if (packageObj) await logExcessiveBilling(packageObj, user_id, subscriptions[i]);
 
                 }else{
                     subscriptionToRenew = [...subscriptionToRenew, subscriptions[i]];

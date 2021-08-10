@@ -20,6 +20,6 @@
     "mongoose": "^5.13.5",
     "mongoose-shortid-nodeps": "^0.6.5",
     "nodemon": "^2.0.12",
-    "shortid": "^2.2.16"
+    "nanoid": "^3.1.23"
   }
 }

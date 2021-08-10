@@ -5,6 +5,7 @@ const config = require('../config');
 const helper = require('../helper/helper');
 const moment = require('moment-timezone');
 const lodash = require('lodash');
+const { nanoid } = require('nanoid');
 
 subscriptionRenewal = async(packages) => {
     try {
@@ -112,18 +113,18 @@ renewSubscription = async(subscription, packages) => {
 
     if(subscription.try_micro_charge_in_next_cycle === true && subscription.micro_price_point > 0){
         if(subscription.payment_source === 'easypaisa'){
-            transactionId = `epmicro_${subscription._id}_${shortId.generate()}`;
+            transactionId = `epmicro_${nanoid(10)}`;
         }else{
-            transactionId = `tpmicro_${subscription._id}_${shortId.generate()}`;
+            transactionId = `tpmicro_${subscription._id}_${nanoid(10)}`;
         }
         mcDetails.micro_charge = true;
         mcDetails.micro_price = subscription.micro_price_point;
     }else{
         mcDetails.micro_charge = false;
         if(subscription.payment_source === 'easypaisa'){
-            transactionId = `ep_${subscription._id}_${shortId.generate()}`;
+            transactionId = `epfull_${nanoid(10)}`;
         }else{
-            transactionId = `tp_${subscription._id}_${shortId.generate()}`;
+            transactionId = `tpfull_${subscription._id}_${nanoid(10)}`;
         }
     }
 

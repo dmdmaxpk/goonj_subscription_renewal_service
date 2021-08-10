@@ -48,7 +48,7 @@ const queueNames = {
 let config = {
     development: {
         port: 3005,
-        mongo_connection_url: `mongodb://10.0.1.21:27017/${db_name}`,
+        mongo_connection_url: `mongodb://localhost:27017/${db_name}`,
         queueNames: queueNames,
         codes: codes,
         servicesUrls: servicesUrls,
@@ -60,7 +60,7 @@ let config = {
     },
     staging: {
         port: 3005,
-        mongo_connection_url: `mongodb://10.0.1.21:27017/${db_name}`,
+        mongo_connection_url: `mongodb://localhost:27017/${db_name}`,
         queueNames: queueNames,
         codes: codes,
         servicesUrls: servicesUrls,
@@ -72,7 +72,7 @@ let config = {
     },
     production: {
         port: 3005,
-        mongo_connection_url: `mongodb://10.0.1.21:27017/${db_name}`,
+        mongo_connection_url: `mongodb://localhost:27017/${db_name}`,
         queueNames: queueNames,
         codes: codes,
         servicesUrls: servicesUrls,

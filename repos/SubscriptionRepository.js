@@ -284,10 +284,8 @@ class SubscriptionRepository {
     }
     
     async setAsBillableInNextCycle (subscription_ids)  {
-        await Promise.all([
-            Subscription.updateMany({_id: {$in :subscription_ids}, try_micro_charge_in_next_cycle: true},{$set:{is_billable_in_this_cycle: true}}),
-            Subscription.updateMany({_id: {$in :subscription_ids}, try_micro_charge_in_next_cycle: false},{$set:{is_billable_in_this_cycle: true, priority: 1}})
-        ]);
+        await Subscription.updateMany({_id: {$in :subscription_ids}}, {$set:{is_billable_in_this_cycle: true}});
+        return;
     }
 
     async getGrayListSubscriptions(){

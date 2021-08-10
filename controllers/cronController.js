@@ -16,7 +16,7 @@ exports.markRenewableUserForcefully = async (req, res) =>  {
 
 exports.renewSubscriptions = async (req, res) =>  {
     console.log("Renewing Subscriptions")
-    let packages = await axios({method: 'get', url: config.servicesUrls.core_service = '/package/all?slug=live', headers: {'Content-Type': 'application/json' }
+    let packages = await axios({method: 'get', url: config.servicesUrls.core_service + '/package/all?slug=live', headers: {'Content-Type': 'application/json' }
     }).then(function(response){
         return response.data;
     }).catch(function(err){

@@ -8,6 +8,9 @@ const lodash = require('lodash');
 const { nanoid } = require('nanoid');
 const axios = require('axios');
 
+const RabbitMq = require('../rabbit/RabbitMq');
+const rabbitMq = new RabbitMq().getInstance();
+
 subscriptionRenewal = async(packages) => {
     try {
         let subscriptions = await subscriptionRepo.getRenewableSubscriptions();

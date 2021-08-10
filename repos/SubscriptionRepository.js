@@ -266,7 +266,7 @@ class SubscriptionRepository {
         let now = moment();
         let endOfDay = now.endOf('day').tz("Asia/Karachi");
     
-        let count = await Subscription.count(
+        let count = await Subscription.countDocuments(
             {$or:[{subscription_status:'billed'},
             {subscription_status:'graced'},
             {subscription_status:'trial'}],

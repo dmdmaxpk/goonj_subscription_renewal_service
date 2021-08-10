@@ -182,9 +182,9 @@ mark = async(operator) => {
     console.log(`Subscription to renew count for ${operator} are ${totalCount}`);
 
     let chunkSize = 10000;
-    let totalChunks = totalCount / chunkSize;
+    let totalChunks = float2Int(totalCount / chunkSize);
     let reminders = totalCount % chunkSize;
-    console.log("Total chunks="+totalChunks+" & total reminders="+reminders);
+    console.log("Total chunks = "+totalChunks+" & total reminders = "+reminders);
 
     let lastId = undefined;
     for(let i = 0; i < totalChunks; i++){
@@ -201,6 +201,10 @@ mark = async(operator) => {
     let response = await getMarkUsersPromise(reminders, lastId, operator);
     console.log("Reminder - ", response);
     console.log("Subscription marking for current billing cycle completed");
+}
+
+float2Int = (float) => {
+    return float | 0;
 }
 
 markRenewableUserForcefully = async() => {

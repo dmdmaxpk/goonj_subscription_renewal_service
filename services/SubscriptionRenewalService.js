@@ -113,24 +113,30 @@ expire = async(subscription) => {
 }
 
 renewSubscription = async(subscription, packages) => {
-    let transactionId;
+    let messageObj = {};
     let mcDetails = {};
 
     if(subscription.try_micro_charge_in_next_cycle === true && subscription.micro_price_point > 0){
         if(subscription.payment_source === 'easypaisa'){
-            transactionId = `epmicro_${nanoid(10)}`;
+            messageObj.transaction_id = `epmicro_${nanoid(10)}`;
         }else{
-            transactionId = `tpmicro_${subscription._id}_${nanoid(10)}`;
+            messageObj.transaction_id = `tpmicro_${subscription._id}_${nanoid(10)}`;
         }
-        mcDetails.micro_charge = true;
-        mcDetails.micro_price = subscription.micro_price_point;
+        messageObj.micro_charge = true;
+        messageObj.amount = subscription.micro_price_point;
     }else{
-        mcDetails.micro_charge = false;
         if(subscription.payment_source === 'easypaisa'){
-            transactionId = `epfull_${nanoid(10)}`;
+            messageObj.transaction_id = `epfull_${nanoid(10)}`;
         }else{
-            transactionId = `tpfull_${subscription._id}_${nanoid(10)}`;
+            messageObj.transaction_id = `tpfull_${subscription._id}_${nanoid(10)}`;
         }
+
+        let subscribedPackage = packages.filter((package) => {
+            return package._id === subscription.subscribed_package_id
+        })[0];
+
+        messageObj.micro_charge = false;
+        messageObj.amount = subscribedPackage.price_point_pkr
     }
 
     // Add object in queueing server
@@ -143,24 +149,15 @@ renewSubscription = async(subscription, packages) => {
     });
 
     if(user && subscription.queued === false && subscription.active){
-        let subscribedPackage = packages.filter((package) => {
-            return package._id === subscription.subscribed_package_id
-        })[0];
-        
-        subscriptionRepo.updateSubscription(subscription._id, {queued: true});
-
-        let messageObj = {};
+        messageObj.package = subscribedPackage
+        messageObj.user = user;
         messageObj.subscription_id = subscription._id;
         messageObj.payment_source = subscription.payment_source;
         messageObj.ep_token = subscription.ep_token;
-        messageObj.mc_details = mcDetails;
-        messageObj.transaction_id = transactionId;
-        messageObj.price_point = subscribedPackage.price_point_pkr
-        messageObj.partner_id = subscribedPackage.partner_id;
-        messageObj.user_id = user._id;
-        messageObj.msisdn = user.msisdn;
 
         rabbitMq.addInQueue(config.queueNames.subscriptionDispatcher, messageObj);
+        subscriptionRepo.updateSubscription(subscription._id, {queued: true});
+        
         console.log(subscription._id, ' added in queue');
     }else{
         console.log(`Either user ${subscription.user_id} does not exist or the subscription ${subscription._id} is not active or the subscription ${subscription._id} is already queued`);

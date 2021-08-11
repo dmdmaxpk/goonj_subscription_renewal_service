@@ -114,7 +114,7 @@ expire = async(subscription) => {
 
 renewSubscription = async(subscription, packages) => {
     let messageObj = {};
-    let mcDetails = {};
+    let subscribedPackage = undefined;
 
     if(subscription.try_micro_charge_in_next_cycle === true && subscription.micro_price_point > 0){
         if(subscription.payment_source === 'easypaisa'){
@@ -131,7 +131,7 @@ renewSubscription = async(subscription, packages) => {
             messageObj.transaction_id = `tpfull_${subscription._id}_${nanoid(10)}`;
         }
 
-        let subscribedPackage = packages.filter((package) => {
+        subscribedPackage = packages.filter((package) => {
             return package._id === subscription.subscribed_package_id
         })[0];
 

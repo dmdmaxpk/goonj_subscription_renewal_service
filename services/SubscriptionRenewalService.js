@@ -143,7 +143,10 @@ renewSubscription = async(subscription, packages) => {
     });
 
     if(user && subscription.queued === false && subscription.active){
-        let subscribedPackage = lodash.filter(packages, package => package._id === subscription.subscribed_package_id);
+        let subscribedPackage = packages.filter((package) => {
+            return package._id === subscription.subscribed_package_id
+        })[0];
+        
         subscriptionRepo.updateSubscription(subscription._id, {queued: true});
 
         let messageObj = {};

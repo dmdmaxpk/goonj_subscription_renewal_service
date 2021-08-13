@@ -120,8 +120,6 @@ renewSubscription = async(subscription, packages) => {
         return package._id === subscription.subscribed_package_id
     })[0];
 
-    console.log('Subscribed package', subscribedPackage);
-
     if(subscription.try_micro_charge_in_next_cycle === true && subscription.micro_price_point > 0){
         if(subscription.payment_source === 'easypaisa'){
             messageObj.transaction_id = `epmicro_${nanoid(10)}`;

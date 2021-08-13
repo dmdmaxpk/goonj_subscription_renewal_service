@@ -133,7 +133,9 @@ renewSubscription = async(subscription, packages) => {
 
         subscribedPackage = packages.filter((package) => {
             return package._id === subscription.subscribed_package_id
-        })[0];
+        });
+
+        console.log('subscribed package', subscribedPackage);
 
         messageObj.micro_charge = false;
         messageObj.amount = subscribedPackage.price_point_pkr

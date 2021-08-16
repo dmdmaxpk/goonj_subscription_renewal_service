@@ -162,7 +162,7 @@ class SubscriptionConsumer {
                     let hoursSpentInGracePeriod = timeInGrace.asHours();
                     console.log("hours in grace period:", hoursSpentInGracePeriod);
             
-                    if (hoursSpentInGracePeriod > packageObj.grace_hours){
+                    if (hoursSpentInGracePeriod > mPackage.grace_hours){
                         subscriptionObj.subscription_status = 'expired';
                         subscriptionObj.consecutive_successive_bill_counts = 0;
                         subscriptionObj.auto_renewal = false;
@@ -179,7 +179,7 @@ class SubscriptionConsumer {
                         let message = 'You package to Goonj TV has expired, click below link to subscribe again.\n'+link;
                         this.sendMessage(user.msisdn, message);
                         historyStatus = "expired";
-                    }else if(packageObj.is_micro_charge_allowed === true){
+                    }else if(mPackage.is_micro_charge_allowed === true){
                         subscriptionObj = this.activateMicroCharging(subscription, mPackage, subscriptionObj);
 
                         console.log("micro charging activated for subsription id: ", subscription._id, subscriptionObj);

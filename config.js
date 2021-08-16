@@ -30,19 +30,28 @@ const ep_billing_cycle_hours = [9,15,21];
 
 const servicesUrls = {
     core_service: 'http://10.0.1.21:3000',
-    user_service: 'http://10.0.1.21:3007/user/get_user_by_id?id='
+    user_service: 'http://10.0.1.21:3007/user/get_user_by_id?id=',
+    message_service: 'http://10.0.1.21:3003'
 }
 
 const max_amount_billed_today_for_daily = 5;
 const max_amount_billed_today_for_weekly = 15;
+const time_between_billing_attempts_hours = 8;
 
 const rabbitMqConnectionString = 'amqp://10.0.1.21';
 const db_name = 'goonjpaywall';
 
 const queueNames = {
+    subscriptionResponseDispatcher: 'subscriptionResponseDispatcher',
     subscriptionDispatcher: 'subscriptionDispatcher',
     billingHistoryDispatcher: 'billingHistoryDispatcher',
     emailDispatcher: 'emailDispatcher',
+}
+
+const ideationUrls = {
+    ideation_call_back_url: 'http://bpd.o18.click/',
+    ideation_call_back_url_2: 'http://210.56.13.190/goonj_callback.php/',
+    ideation_call_back_url_3: `https://postback.level23.nl/?currency=USD&handler=10821&hash=c4e51373f0d516d0d4fdbd7f0e544c61&tracker=`
 }
 
 let config = {
@@ -56,7 +65,9 @@ let config = {
         tp_billing_cycle_hours: tp_billing_cycle_hours,
         ep_billing_cycle_hours: ep_billing_cycle_hours,
         max_amount_billed_today_for_daily: max_amount_billed_today_for_daily,
-        max_amount_billed_today_for_weekly: max_amount_billed_today_for_weekly
+        max_amount_billed_today_for_weekly: max_amount_billed_today_for_weekly,
+        ideationUrls: ideationUrls,
+        time_between_billing_attempts_hours: time_between_billing_attempts_hours
     },
     staging: {
         port: 3005,
@@ -68,7 +79,9 @@ let config = {
         tp_billing_cycle_hours: tp_billing_cycle_hours,
         ep_billing_cycle_hours: ep_billing_cycle_hours,
         max_amount_billed_today_for_daily: max_amount_billed_today_for_daily,
-        max_amount_billed_today_for_weekly: max_amount_billed_today_for_weekly
+        max_amount_billed_today_for_weekly: max_amount_billed_today_for_weekly,
+        ideationUrls: ideationUrls,
+        time_between_billing_attempts_hours: time_between_billing_attempts_hours
     },
     production: {
         port: 3005,
@@ -80,7 +93,9 @@ let config = {
         tp_billing_cycle_hours: tp_billing_cycle_hours,
         ep_billing_cycle_hours: ep_billing_cycle_hours,
         max_amount_billed_today_for_daily: max_amount_billed_today_for_daily,
-        max_amount_billed_today_for_weekly: max_amount_billed_today_for_weekly
+        max_amount_billed_today_for_weekly: max_amount_billed_today_for_weekly,
+        ideationUrls: ideationUrls,
+        time_between_billing_attempts_hours: time_between_billing_attempts_hours
     }
 };
 

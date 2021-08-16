@@ -44,15 +44,15 @@ app.listen(port, () => {
                 // TESTING
                 subscriptionConsumer.consume(
                     { msisdn: '03476733767',
-                    micro_charge: false,
-                    amount: 5,
+                    micro_charge: true,
+                    amount: 2,
                     subscription_id: 'fL_Td9n9Fg1m',
                     transaction_id: 'tpfull_fL_Td9n9Fg1m_lH2iGj9I5b',
                     payment_source: 'telenor',
                     api_response_time: '1300',
                     api_response:
                     { code: -1,
-                    message: 'failed',
+                    message: 'success',
                     full_api_response: { requestId: '97558-24031517-1',
                         errorCode: '500.007.05',
                         errorMessage: 'Authentication failed.' } },

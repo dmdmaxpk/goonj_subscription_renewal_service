@@ -279,18 +279,16 @@ class SubscriptionConsumer {
 
         console.log(`sending affiliate marketing callback having TID - ${tid} - MID ${mid}`);
         this.sendCallBackToIdeation(mid, tid).then(async (fulfilled) => {
-            let updated = await subscriptionRepository.updateSubscription(subscription_id, {is_affiliation_callback_executed: true});
-            if(updated){
-                console.log(`successfully sent affiliate marketing callback having TID - ${tid} - MID ${mid} - ideation response - ${fulfilled}`);
-                history.operator_response = fulfilled;
-                history.billing_status = "Affiliate callback sent";
-                await this.sendHistory(history);
-            }
+            console.log(`Successfully sent affiliate marketing callback having TID - ${tid} - MID ${mid} - ideation response - ${fulfilled}`);
+            await subscriptionRepository.updateSubscription(subscription_id, {is_affiliation_callback_executed: true});
+            history.operator_response = fulfilled;
+            history.billing_status = "Affiliate callback sent";
+            this.sendHistory(history);
         }).catch(async  (error) => {
             console.log(`Affiliate - Marketing - Callback - Error - Having TID - ${tid} - MID ${mid}`, error);
             history.operator_response = error.response.data;
             history.billing_status = "Affiliate callback error";
-            await this.sendHistory(history);
+            this.sendHistory(history);
         });
     }
 
@@ -318,7 +316,7 @@ class SubscriptionConsumer {
                 });
             });
         }else{
-            console.log('Invalid mid found');
+            console.warn('Invalid mid found');
         }
     }
 

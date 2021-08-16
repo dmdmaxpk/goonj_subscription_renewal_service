@@ -17,7 +17,7 @@ const rabbitMq = new RabbitMq().getInstance();
  *      // Response object
         Subscription response: { msisdn: '03476733767',
   micro_charge: false,
-  amount: 5,
+  amount: 2,
   subscription_id: 'fL_Td9n9Fg1m',
   transaction_id: 'tpfull_fL_Td9n9Fg1m_lH2iGj9I5b',
   payment_source: 'telenor',

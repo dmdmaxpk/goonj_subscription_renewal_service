@@ -77,7 +77,7 @@ class SubscriptionConsumer {
         let micro_charge = messageObject.micro_charge;
         let amount = messageObject.amount;
         let transaction_id = messageObject.transaction_id;
-        let api_response = messageObject.api_response.full_api_response;
+        let api_response = messageObject.api_response;
         
         let response_time = 0;
         if (messageObject.hasOwnProperty('api_response_time')){
@@ -125,11 +125,11 @@ class SubscriptionConsumer {
                 if(micro_charge === true && amount > 0){
                     console.log('micro charge success');
                     this.sendMicroChargeMessage(user.msisdn, mPackage.display_price_point, amount, mPackage.package_name)
-                    this.assembleAndSendBillingHistory(user, subscription, mPackage, api_response, api_response.message, response_time, transaction_id, true, amount);
+                    this.assembleAndSendBillingHistory(user, subscription, mPackage, api_response.full_api_response, api_response.message, response_time, transaction_id, true, amount);
                 }else{
                     console.log('full charge success');
                     this.sendRenewalMessage(subscription, user.msisdn, mPackage._id, user._id)
-                    this.assembleAndSendBillingHistory(user, subscription, mPackage, api_response, api_response.message, response_time, transaction_id, false, amount);
+                    this.assembleAndSendBillingHistory(user, subscription, mPackage, api_response.full_api_response, api_response.message, response_time, transaction_id, false, amount);
                 }
                 
             }else{
@@ -201,7 +201,7 @@ class SubscriptionConsumer {
                 await subscriptionRepository.updateSubscription(subscription._id, subscriptionObj);
                 historyStatus = historyStatus === undefined ? subscriptionObj.status : historyStatus;
 
-                this.assembleAndSendBillingHistory(user, subscription, mPackage, api_response, historyStatus, response_time, transaction_id, micro_charge, amount, expiry_source)
+                this.assembleAndSendBillingHistory(user, subscription, mPackage, api_response.full_api_response, historyStatus, response_time, transaction_id, micro_charge, amount, expiry_source)
             }
             return 'Done';
         }else{

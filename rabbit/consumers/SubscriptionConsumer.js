@@ -131,7 +131,6 @@ class SubscriptionConsumer {
                     this.sendRenewalMessage(subscription, user.msisdn, mPackage._id, user._id)
                     this.assembleAndSendBillingHistory(user, subscription, mPackage, api_response.full_api_response, api_response.message, response_time, transaction_id, false, amount);
                 }
-                
             }else{
                 let expiry_source = undefined;
                 let historyStatus = undefined;
@@ -318,6 +317,8 @@ class SubscriptionConsumer {
                     reject(err);
                 });
             });
+        }else{
+            console.log('Invalid mid found');
         }
     }
 

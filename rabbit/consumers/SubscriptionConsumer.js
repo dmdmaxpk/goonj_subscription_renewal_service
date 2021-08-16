@@ -24,8 +24,8 @@ const rabbitMq = new RabbitMq().getInstance();
   api_response_time: '1300',
   api_response:
    { code: -1,
-     message:
-      { requestId: '97558-24031517-1',
+     message: 'failed',
+     full_api_response: { requestId: '97558-24031517-1',
         errorCode: '500.007.05',
         errorMessage: 'Authentication failed.' } },
   user:
@@ -77,7 +77,7 @@ class SubscriptionConsumer {
         let micro_charge = messageObject.micro_charge;
         let amount = messageObject.amount;
         let transaction_id = messageObject.transaction_id;
-        let api_response = messageObject.api_response;
+        let api_response = messageObject.api_response.full_api_response;
         
         let response_time = 0;
         if (messageObject.hasOwnProperty('api_response_time')){

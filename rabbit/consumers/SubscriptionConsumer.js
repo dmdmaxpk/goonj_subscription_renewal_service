@@ -85,7 +85,7 @@ class SubscriptionConsumer {
         }
 
         if(api_response){
-            if(api_response.status === 0 && api_response.message === 'success'){ 
+            if(api_response.code === config.codes.code_success && api_response.message === 'success'){ 
                 
                 // success billing
                 let serverDate = new Date();

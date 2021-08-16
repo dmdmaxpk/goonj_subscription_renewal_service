@@ -51,7 +51,7 @@ app.listen(port, () => {
                     payment_source: 'telenor',
                     api_response_time: '1300',
                     api_response:
-                    { code: -1,
+                    { code: 0,
                     message: 'success',
                     full_api_response: { requestId: '97558-24031517-1',
                         errorCode: '500.007.05',

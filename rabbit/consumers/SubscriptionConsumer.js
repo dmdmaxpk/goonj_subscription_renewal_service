@@ -12,60 +12,6 @@ const subscriptionRepository = new SubscriptionRepository();
 
 const RabbitMq = require('../RabbitMq');
 const rabbitMq = new RabbitMq().getInstance();
-
-/**
- *      // Response object
-        Subscription response: { msisdn: '03476733767',
-  micro_charge: false,
-  amount: 2,
-  subscription_id: 'fL_Td9n9Fg1m',
-  transaction_id: 'tpfull_fL_Td9n9Fg1m_lH2iGj9I5b',
-  payment_source: 'telenor',
-  api_response_time: '1300',
-  api_response:
-   { code: -1,
-     message: 'failed',
-     full_api_response: { requestId: '97558-24031517-1',
-        errorCode: '500.007.05',
-        errorMessage: 'Authentication failed.' } },
-  user:
-   { preferences: [],
-     source: 'app',
-     is_gray_listed: false,
-     is_black_listed: false,
-     active: true,
-     _id: 'NCBv-ZR9-fB6',
-     msisdn: '03476733767',
-     operator: 'telenor',
-     added_dtm: '2021-08-10T07:18:55.617Z',
-     __v: 0 },
-  package:
-   { is_grace_allowed: true,
-     streamable_grace_hours: 24,
-     grace_hours: 1080,
-     is_trial_allowed: false,
-     trial_hours: 24,
-     is_micro_charge_allowed: true,
-     micro_price_points: [ 2, 4 ],
-     default: false,
-     active: true,
-     _id: 'QDfC',
-     logos:
-      [ 'https://content-dmd.s3.eu-central-1.amazonaws.com/TP-Content/static-content/others/tv.png' ],
-     package_name: 'Live TV Daily',
-     package_desc: 'RS. 5 + TAX/DAY',
-     package_duration: 24,
-     price_point_pkr: 5,
-     display_price_point: '5',
-     partner_id: 'TP-GoonjDailySub',
-     added_dtm: '2020-06-19T01:10:37.816Z',
-     last_modified: '2020-06-19T01:10:37.816Z',
-     paywall_id: 'ghRtjhT7',
-     slug: 'live',
-     display_price_point_numeric: 5 } }
-
- */
-
 class SubscriptionConsumer {
 
     async consume(messageObject) {

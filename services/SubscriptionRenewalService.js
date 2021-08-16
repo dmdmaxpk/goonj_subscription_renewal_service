@@ -68,11 +68,9 @@ logExcessiveBilling = async (packageObj, user_id, subscription) => {
     history.package_id = packageObj._id;
     history.paywall_id = packageObj.paywall_id;
     history.subscription_id = subscription._id;
-    history.subscriber_id = subscription.subscriber_id;
-    history.transaction_id = subscription.transaction_id;
-    history.operator_response = {"message": `Subscription ${subscription._id} has exceeded their billing limit. Email sent.`};
+    history.operator_response = {"message": `Subscription ${subscription._id} has exceeded their billing limit.`};
     history.billing_status = "billing_exceeded";
-    helper.sendToQueue(config.queueNames.billingHistoryDispatcher, history);
+    rabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
 
     // Shoot an email
     let messageObj = {};
@@ -80,7 +78,7 @@ logExcessiveBilling = async (packageObj, user_id, subscription) => {
     messageObj.to = ["muhammad.azam@dmdmax.com", "farhan.ali@dmdmax.com"]; // for testing
     messageObj.subject = 'Excessive Charge Email';
     messageObj.text = `Subscription id ${subscription._id} is trying to charge on a price greater than package price.`;
-    helper.sendToQueue(config.queueNames.emailDispatcher, messageObj);
+    rabbitMq.addInQueue(config.queueNames.emailDispatcher, messageObj);
 }
 
 expire = async(subscription) => {

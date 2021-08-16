@@ -555,26 +555,25 @@ class SubscriptionRepository {
     console.log("=> data fetched", data.length);
     
     return data;
-}
+    }
 
-async getPreRenwalSubscriptions(){
-    var date = new Date();
-    let datDate = new Date();
-    // add a day
-    date = date.setDate(date.getDate() + 1);
-    datDate = datDate.setDate(datDate.getDate() + 2)
-    
-    let subs = await Subscription.aggregate([
-        { $match: {  next_billing_timestamp: { $gte: new Date(date), $lte: new Date(datDate) }, subscription_status: {$in: ['billed'] }, auto_renewal: true, subscribed_package_id: { $in: ['QDfG'] } } }
-    ]);
-    return subs;
-}
+    async getPreRenwalSubscriptions(){
+        var date = new Date();
+        let datDate = new Date();
+        // add a day
+        date = date.setDate(date.getDate() + 1);
+        datDate = datDate.setDate(datDate.getDate() + 2)
+        
+        let subs = await Subscription.aggregate([
+            { $match: {  next_billing_timestamp: { $gte: new Date(date), $lte: new Date(datDate) }, subscription_status: {$in: ['billed'] }, auto_renewal: true, subscribed_package_id: { $in: ['QDfG'] } } }
+        ]);
+        return subs;
+    }
 
-// Subscription Consumer functions
-async unQueue (subscription_id) {
-    await this.subscriptionRepo.updateSubscription(subscription_id, {queued: false, is_billable_in_this_cycle:false, priority: 0});
-}
-
+    // Subscription Consumer functions
+    async unQueue (subscription_id) {
+        await this.subscriptionRepo.updateSubscription(subscription_id, {queued: false, is_billable_in_this_cycle:false, priority: 0});
+    }
 }
 
 module.exports = SubscriptionRepository;

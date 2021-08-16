@@ -297,11 +297,11 @@ class SubscriptionConsumer {
     async sendCallBackToIdeation(mid, tid)  {
         var url = undefined; 
         if (mid === "1569") {
-            url = config.ideationUrls.ideation_callback_url + `p?mid=${mid}&tid=${tid}`;
+            url = config.ideationUrls.ideation_call_back_url + `p?mid=${mid}&tid=${tid}`;
         } else if (mid === "goonj"){
-            url = config.ideationUrls.ideation_callback_url2 + `?txid=${tid}`;
+            url = config.ideationUrls.ideation_call_back_url_2 + `?txid=${tid}`;
         } else if (mid === "aff3" || mid === "aff3a"){
-            url = config.ideationUrls.ideation_callback_url3 + `${tid}`;
+            url = config.ideationUrls.ideation_call_back_url_3 + `${tid}`;
         }
 
         if(url){

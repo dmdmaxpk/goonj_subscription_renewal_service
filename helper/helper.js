@@ -7,6 +7,10 @@ class Helper {
         rabbitMq.addInQueue(queueName, messageObj);
         return true;
     }
+
+    static float2Int = (float) => {
+        return float | 0;
+    }
 }
 
 module.exports = Helper;

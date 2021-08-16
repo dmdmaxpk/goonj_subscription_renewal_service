@@ -159,8 +159,8 @@ class SubscriptionConsumer {
             
                     let nowDate = moment();
                     let timeInGrace = moment.duration(nowDate.diff(subscription.date_on_which_user_entered_grace_period));
-                    let hoursSpentInGracePeriod = timeInGrace.asHours();
-                    console.log("hours in grace period:", hoursSpentInGracePeriod);
+                    let hoursSpentInGracePeriod = helper.float2Int(timeInGrace.asHours());
+                    console.log(`${subscription._id} spent ${hoursSpentInGracePeriod} hours in grace period`);
             
                     if (hoursSpentInGracePeriod > mPackage.grace_hours){
                         subscriptionObj.subscription_status = 'expired';
@@ -182,7 +182,7 @@ class SubscriptionConsumer {
                     }else if(mPackage.is_micro_charge_allowed === true){
                         subscriptionObj = this.activateMicroCharging(subscription, mPackage, subscriptionObj);
 
-                        console.log("micro charging activated for subsription id: ", subscription._id, subscriptionObj);
+                        console.log("micro charging activated for subsription id: ", subscription._id);
                         subscriptionObj.subscription_status = 'graced';
                     }
                 }else{
@@ -336,13 +336,12 @@ class SubscriptionConsumer {
         history.operator = subscription.payment_source ? subscription.payment_source : 'telenor';
         history.price = price;
         history.micro_charge = micro_charge;
-        console.log("assembled billing history: ", history);
-
         this.sendHistory(history);
     }
 
     sendHistory(history){
         rabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
+        console.log('History sent to queue:', history);
     }
 
     sendMessage(msisdn, message){

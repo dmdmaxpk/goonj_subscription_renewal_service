@@ -8,7 +8,7 @@ class Helper {
         return true;
     }
 
-    static float2Int = (float) => {
+    static float2Int(float) {
         return float | 0;
     }
 }

@@ -12,7 +12,6 @@ const subscriptionRepository = new SubscriptionRepository();
 
 const RabbitMq = require('../RabbitMq');
 const rabbitMq = new RabbitMq(config.billingHistoryRabbitMqConnectionString).getInstance();
-
 class SubscriptionConsumer {
 
     async consume(messageObject) {
@@ -192,6 +191,7 @@ class SubscriptionConsumer {
     
             //Send acknowldement to user
             let message = constants.message_after_first_successful_charge[package_id];
+            console.log("warning", constants.message_after_first_successful_charge)
             message = message.replace("%user_id%", user_id)
             message = message.replace("%pkg_id%", package_id)
             this.sendMessage(msisdn, message);
@@ -286,7 +286,6 @@ class SubscriptionConsumer {
     }
 
     sendHistory(history){
-        console.log(rabbitMq);
         rabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
         console.log('History sent to queue:', history.operator_response);
     }

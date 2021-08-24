@@ -191,12 +191,10 @@ class SubscriptionConsumer {
     
             //Send acknowldement to user
             let message = constants.message_after_first_successful_charge[package_id];
-            console.log("warning", constants.message_after_first_successful_charge)
             message = message.replace("%user_id%", user_id)
             message = message.replace("%pkg_id%", package_id)
             this.sendMessage(msisdn, message);
         }else if((subscription.consecutive_successive_bill_counts + 1) % 7 === 0 || (package_id === 'QDfG')){
-            console.log("warning", constants.message_after_repeated_succes_charge)        
             let message = constants.message_after_repeated_succes_charge[package_id];
             message = message.replace("%user_id%", user_id)
             message = message.replace("%pkg_id%", package_id)

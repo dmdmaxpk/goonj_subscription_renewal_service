@@ -31,7 +31,7 @@ class RabbitMq {
             if (error) {
                 callback(error);
             }else{
-                console.info(`Connection successfull with ${this.connection_string}`);
+                //console.info(`Connection successfull with ${this.connection_string}`);
                 callback(null, connection);
                 this.connection = connection;
             }
@@ -85,7 +85,7 @@ class Singleton {
             config.rabbitMqConnections.push({connection_string, instance});
             console.info(`Object for ${connection_string} not found and thus added in dict.`)
         }else{
-            console.info(`Object for ${connection_string} found`)
+            //console.info(`Object for ${connection_string} found`)
         }
     }
   

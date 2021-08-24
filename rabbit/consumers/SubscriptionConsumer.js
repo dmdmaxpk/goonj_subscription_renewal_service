@@ -12,6 +12,7 @@ const subscriptionRepository = new SubscriptionRepository();
 
 const RabbitMq = require('../RabbitMq');
 const rabbitMq = new RabbitMq(config.billingHistoryRabbitMqConnectionString).getInstance();
+
 class SubscriptionConsumer {
 
     async consume(messageObject) {
@@ -285,6 +286,7 @@ class SubscriptionConsumer {
     }
 
     sendHistory(history){
+        console.log(rabbitMq);
         rabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
         console.log('History sent to queue:', history.operator_response);
     }

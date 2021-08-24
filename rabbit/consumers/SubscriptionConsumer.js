@@ -11,7 +11,7 @@ const SubscriptionRepository = require('../../repos/SubscriptionRepository');
 const subscriptionRepository = new SubscriptionRepository();
 
 const RabbitMq = require('../RabbitMq');
-const rabbitMq = new RabbitMq().getInstance();
+const rabbitMq = new RabbitMq(config.billingHistoryRabbitMqConnectionString).getInstance();
 class SubscriptionConsumer {
 
     async consume(messageObject) {
@@ -286,7 +286,7 @@ class SubscriptionConsumer {
 
     sendHistory(history){
         rabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
-        console.log('History sent to queue:', history);
+        console.log('History sent to queue:', history.operator_response);
     }
 
     sendMessage(msisdn, message){

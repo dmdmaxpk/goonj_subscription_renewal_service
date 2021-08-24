@@ -9,7 +9,8 @@ const { nanoid } = require('nanoid');
 const axios = require('axios');
 
 const RabbitMq = require('../rabbit/RabbitMq');
-const rabbitMq = new RabbitMq().getInstance();
+const rabbitMq = new RabbitMq(config.rabbitMqConnectionString).getInstance();
+const billingHistoryRabbitMq = new RabbitMq(config.billingHistoryRabbitMqConnectionString).getInstance();
 
 subscriptionRenewal = async(packages) => {
     try {
@@ -70,7 +71,7 @@ logExcessiveBilling = async (packageObj, user_id, subscription) => {
     history.subscription_id = subscription._id;
     history.operator_response = {"message": `Subscription ${subscription._id} has exceeded their billing limit.`};
     history.billing_status = "billing_exceeded";
-    rabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
+    billingHistoryRabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
 
     // Shoot an email
     let messageObj = {};

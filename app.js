@@ -49,6 +49,7 @@ app.listen(port, () => {
                         rabbitMq.createQueue(config.queueNames.subscriptionDispatcher);
         
                         rabbitMq.consumeQueue(config.queueNames.subscriptionResponseDispatcher, async(message) => {
+                            console.log(JSON.parse(message.content));
                             await subscriptionConsumer.consume(JSON.parse(message.content))
                             rabbitMq.acknowledge(message);
                         });

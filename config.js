@@ -38,9 +38,9 @@ const max_amount_billed_today_for_daily = 5;
 const max_amount_billed_today_for_weekly = 15;
 const time_between_billing_attempts_hours = 8;
 
-const rabbitMqConnections = [];
 const billingHistoryRabbitMqConnectionString = 'amqp://10.0.1.88';
 const rabbitMqConnectionString = 'amqp://10.0.1.21';
+
 const db_name = 'goonjpaywall';
 
 const queueNames = {
@@ -70,7 +70,6 @@ let config = {
         max_amount_billed_today_for_weekly: max_amount_billed_today_for_weekly,
         ideationUrls: ideationUrls,
         time_between_billing_attempts_hours: time_between_billing_attempts_hours,
-        rabbitMqConnections: rabbitMqConnections,
         billingHistoryRabbitMqConnectionString: billingHistoryRabbitMqConnectionString
     },
     staging: {
@@ -86,7 +85,6 @@ let config = {
         max_amount_billed_today_for_weekly: max_amount_billed_today_for_weekly,
         ideationUrls: ideationUrls,
         time_between_billing_attempts_hours: time_between_billing_attempts_hours,
-        rabbitMqConnections: rabbitMqConnections,
         billingHistoryRabbitMqConnectionString: billingHistoryRabbitMqConnectionString
     },
     production: {
@@ -102,7 +100,6 @@ let config = {
         max_amount_billed_today_for_weekly: max_amount_billed_today_for_weekly,
         ideationUrls: ideationUrls,
         time_between_billing_attempts_hours: time_between_billing_attempts_hours,
-        rabbitMqConnections: rabbitMqConnections,
         billingHistoryRabbitMqConnectionString: billingHistoryRabbitMqConnectionString
     }
 };

@@ -1,7 +1,7 @@
 const config = require('../config');
 const amqp = require('amqplib/callback_api');
 
-class RabbitMq {
+class BillingHistoryRabbitMq {
     constructor() {
         this.connection = null;
         this.channel = null;
@@ -26,7 +26,7 @@ class RabbitMq {
     }
 
     createConnection(callback){
-        amqp.connect(config.rabbitMqConnectionString, (error, connection) => {
+        amqp.connect(config.billingHistoryRabbitMqConnectionString, (error, connection) => {
             if (error) {
                 callback(error);
             }else{
@@ -45,10 +45,6 @@ class RabbitMq {
         });
     }
 
-    createQueue(name, durable = true){
-        this.channel.assertQueue(name, {durable: durable});
-    }
-
     consumeQueue(queue, callback){
         this.channel.consume(queue, async (msg) =>  {
             callback(msg);
@@ -57,14 +53,6 @@ class RabbitMq {
             // proper acknowledgment from the worker, once we're done with a task.
             noAck: false
         });
-    }
-
-    acknowledge(message){
-        this.channel.ack(message);
-    }
-
-    noAcknowledge(message){
-        this.channel.nack(message);
     }
 
     addInQueue(queue, message){
@@ -76,7 +64,7 @@ class RabbitMq {
 class Singleton {
     constructor() {
         if (!Singleton.instance) {
-            Singleton.instance = new RabbitMq();
+            Singleton.instance = new BillingHistoryRabbitMq();
         }
     }
   

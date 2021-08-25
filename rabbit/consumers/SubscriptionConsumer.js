@@ -10,8 +10,8 @@ const constants = require('../../configurations/constants')
 const SubscriptionRepository = require('../../repos/SubscriptionRepository');
 const subscriptionRepository = new SubscriptionRepository();
 
-const RabbitMq = require('../RabbitMq');
-const rabbitMq = new RabbitMq(config.billingHistoryRabbitMqConnectionString).getInstance();
+const BillingHistoryRabbitMq = require('../BillingHistoryRabbitMq');
+const rabbitMq = new BillingHistoryRabbitMq().getInstance();
 
 class SubscriptionConsumer {
 
@@ -287,7 +287,6 @@ class SubscriptionConsumer {
     }
 
     sendHistory(history){
-        console.log(rabbitMq);
         rabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
         console.log('History sent to queue:', history.operator_response);
     }

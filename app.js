@@ -20,9 +20,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/', require('./routes/index'));
 
 const RabbitMq = require('./rabbit/RabbitMq');
-const rabbitMq = new RabbitMq(config.rabbitMqConnectionString).getInstance();
+const rabbitMq = new RabbitMq().getInstance();
 
-const billingHistoryRabbitMq = new RabbitMq(config.billingHistoryRabbitMqConnectionString).getInstance();
+const BillingHistoryRabbitMq = require('./rabbit/BillingHistoryRabbitMq');
+const billingHistoryRabbitMq = new BillingHistoryRabbitMq().getInstance();
 
 const SubscriptionConsumer = require('./rabbit/consumers/SubscriptionConsumer');
 const subscriptionConsumer = new SubscriptionConsumer();
@@ -36,20 +37,22 @@ app.listen(port, () => {
             console.log(error)
         }else{
             console.log('Local RabbitMq status', response);
+            
+            // create queues
+            rabbitMq.createQueue(config.queueNames.subscriptionResponseDispatcher);
+            rabbitMq.createQueue(config.queueNames.subscriptionDispatcher);
 
+
+            // connecting billing history rabbit
             billingHistoryRabbitMq.initServer((error, response) => {
                 if(error){
                     console.log('Billing Hisotry RabbitMq error: ', error);
                 }else{
                     console.log('Billing History RabbitMq status', response);
-
-                    try{
-                        // create queues
-                        rabbitMq.createQueue(config.queueNames.subscriptionResponseDispatcher);
-                        rabbitMq.createQueue(config.queueNames.subscriptionDispatcher);
         
+                    try{
+                        // consuming queue.
                         rabbitMq.consumeQueue(config.queueNames.subscriptionResponseDispatcher, async(message) => {
-                            console.log(JSON.parse(message.content));
                             await subscriptionConsumer.consume(JSON.parse(message.content))
                             rabbitMq.acknowledge(message);
                         });

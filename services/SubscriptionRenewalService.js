@@ -2,15 +2,15 @@ const container = require("../configurations/container");
 const subscriptionRepo = container.resolve("subscriptionRepository");
 
 const config = require('../config');
-const helper = require('../helper/helper');
 const moment = require('moment-timezone');
-const lodash = require('lodash');
 const { nanoid } = require('nanoid');
 const axios = require('axios');
 
 const RabbitMq = require('../rabbit/RabbitMq');
-const rabbitMq = new RabbitMq(config.rabbitMqConnectionString).getInstance();
-const billingHistoryRabbitMq = new RabbitMq(config.billingHistoryRabbitMqConnectionString).getInstance();
+const rabbitMq = new RabbitMq().getInstance();
+
+const BillingHistoryRabbitMq = require('../rabbit/BillingHistoryRabbitMq');
+const billingHistoryRabbitMq = new BillingHistoryRabbitMq().getInstance();
 
 subscriptionRenewal = async(packages) => {
     try {

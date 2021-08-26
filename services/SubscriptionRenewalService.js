@@ -14,6 +14,7 @@ const billingHistoryRabbitMq = new BillingHistoryRabbitMq().getInstance();
 
 subscriptionRenewal = async(packages) => {
     try {
+        ackCronitor('renew-subscriptions', 'run');
         let subscriptions = await subscriptionRepo.getRenewableSubscriptions();
         console.log('Subscription fetched from database to bill', subscriptions.length);
 
@@ -53,8 +54,10 @@ subscriptionRenewal = async(packages) => {
         }
 
         await Promise.all(promises);
+        ackCronitor('renew-subscriptions', 'complete');
     } catch(err){
         console.log(err);
+        ackCronitor('renew-subscriptions', 'fail');
     }
 }
 
@@ -166,6 +169,7 @@ renewSubscription = async(subscription, packages) => {
 
 markRenewableUser = async() => {
     try {
+        ackCronitor('mark-subscriptions-to-renew', 'run');
         let now = moment().tz("Asia/Karachi");
         let hour = now.hours();
         if (config.tp_billing_cycle_hours.includes(hour)) {
@@ -179,6 +183,7 @@ markRenewableUser = async() => {
             console.log(`No billing cycle for telenor/easypaisa at ${hour} O'Clock`);
         }
     } catch(err) {
+        ackCronitor('mark-subscriptions-to-renew', 'fail');
         console.log(`Billing cycle error`, err);
     }
 }
@@ -205,10 +210,10 @@ mark = async(operator) => {
 
     if(reminders > 0){
         //Reminders
-        let response = await getMarkUsersPromise(reminders, lastId, operator);
-        console.log("Reminder - ", response);
-        console.log("Subscription marking for current billing cycle completed");
+        await getMarkUsersPromise(reminders, lastId, operator);
     }
+
+    ackCronitor('mark-subscriptions-to-renew', 'complete');
 }
 
 float2Int = (float) => {
@@ -253,6 +258,16 @@ getMarkUsersPromise = (limit, lastId, operator) =>{
             console.log("Failed to mark, length is "+subscription_ids.length);
             resolve(undefined);
         }
+    });
+}
+
+//mark-subscriptions-to-renew
+ackCronitor = async(job_name, state) => {
+    axios.get(`https://cronitor.link/p/0b25c0a561ad46468f0e66907d9983d0/${job_name}?state=${state}`)
+    .then(res => {
+        console.log(new Date(), `${job_name} - cronitor acknowledgement for state ${state}`);
+    }).catch(err => {
+        console.log(new Date(), `${job_name} - cronitor acknowledgement for state ${state} err:`, err);
     });
 }
 

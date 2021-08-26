@@ -3,8 +3,7 @@ const config = require('../config');
 const axios = require('axios');
 
 exports.markRenewableUsers = async (req, res) =>  {
-    console.log("Marking renewable users")
-    renewalService.markRenewableUser();
+    await renewalService.markRenewableUser();
     res.send({status: config.codes.code_success, message: 'MarkRenewableUsers Executed'});
 }
 
@@ -15,7 +14,6 @@ exports.markRenewableUserForcefully = async (req, res) =>  {
 }
 
 exports.renewSubscriptions = async (req, res) =>  {
-    console.log("Renewing Subscriptions")
     let packages = await axios({method: 'get', url: config.servicesUrls.core_service + '/package/all?slug=live', headers: {'Content-Type': 'application/json' }
     }).then(function(response){
         return response.data;
@@ -26,7 +24,6 @@ exports.renewSubscriptions = async (req, res) =>  {
 
     if(packages){
         renewalService.subscriptionRenewal(packages);
-        console.log('RenewSubscriptions Executed');
         res.send({status: config.codes.code_success, message: 'RenewSubscriptions Executed'});
     }else{
         console.log('Packages not available');

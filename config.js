@@ -39,7 +39,7 @@ const max_amount_billed_today_for_weekly = 15;
 const time_between_billing_attempts_hours = 8;
 
 const billingHistoryRabbitMqConnectionString = 'amqp://10.0.1.88';
-const rabbitMqConnectionString = 'amqp://10.0.1.21';
+const rabbitMqConnectionString = 'amqp://127.0.0.1';
 
 const db_name = 'goonjpaywall';
 

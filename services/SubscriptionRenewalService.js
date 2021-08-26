@@ -236,14 +236,16 @@ validate = async() => {
     console.log("Total billable in cycle count is " + totalCount);
 
     if(totalCount < countThreshold){
-        //Todo: send email to email service
-        let subject = 'Billing Cycle Count Lower Than Expected';
-        let text = `Total billable cycle count is ${totalCount}, which is lower than threshold ${countThreshold}. Please check as soon as possible!`
-        let email= ['paywall@dmdmax.com.pk', 'mikaeel@dmdmax.com', 'usama.shamim@dmdmax.com'];
-        emailService.sendEmail(subject, text, email);
-        console.log('==> Email alert Sent!');
-    }
-    else{
+        axios.post(`${config.servicesUrls.message_service}/message/email`, {
+            subject: 'Billing Cycle Count Lower Than Expected', 
+            text: `Total billable cycle count is ${totalCount}, which is lower than threshold ${countThreshold}. Please check asap!`,
+            email: ['paywall@dmdmax.com.pk', 'usama.shamim@dmdmax.com', 'taha@dmdmdax.com', 'nauman@dmdmax.com', 'muhammad.azam@dmdmax.com']
+        }).then(res => {
+            console.log('email sent with response: ', res.data);
+        }).catch(err => {
+            console.log('email service throws error:', err)
+        });
+    }else {
         console.log('Total billable cycle count seems alright!');
     }
 }

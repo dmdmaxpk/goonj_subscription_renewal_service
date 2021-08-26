@@ -1,4 +1,5 @@
 const express = require('express');
+const logger = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const config = require('./config');
@@ -15,6 +16,7 @@ mongoose.connection.on('error', err => console.error(`Error: ${err.message}`));
 // Middlewares
 app.use(bodyParser.json({limit: '5120kb'}));  //5MB
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(logger('dev'));
 
 // Import routes
 app.use('/', require('./routes/index'));

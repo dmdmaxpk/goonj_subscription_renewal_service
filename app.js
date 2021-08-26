@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const config = require('./config');
-
+const axios = require('axios');
 const app = express();
 
 // Import database models
@@ -28,8 +28,31 @@ const billingHistoryRabbitMq = new BillingHistoryRabbitMq().getInstance();
 const SubscriptionConsumer = require('./rabbit/consumers/SubscriptionConsumer');
 const subscriptionConsumer = new SubscriptionConsumer();
 
-// Start Server
 let { port } = config;
+
+// at every 3 minutes local cron to trigger billing
+var CronJob = require('cron').CronJob;
+var billingJob = new CronJob('*/3 * * * *', function() {
+    axios.get(`http://localhost:${port}/cron/renewSubscriptions`).then(res => {
+        console.log(res.data);
+    }).catch(err =>{
+        console.log('error while running billing cron:', err);
+    });
+}, null, true, 'Asia/Karachi');
+billingJob.start();
+
+// at every hour local cron to mark user who are supposed to be charged
+var markRenewalsJob = new CronJob('0 * * * *', function() {
+    axios.get(`http://localhost:${port}/cron/renewSubscriptions`).then(res => {
+        console.log(res.data);
+    }).catch(err =>{
+        console.log('error while running mark renewal cron:', err);
+    });
+}, null, true, 'Asia/Karachi');
+markRenewalsJob.start();
+
+// Start Server
+
 app.listen(port, () => {
     console.log(`Subscription Renewal Service Running On Port ${port}`);
     rabbitMq.initServer((error, response) => {

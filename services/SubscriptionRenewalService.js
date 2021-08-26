@@ -39,7 +39,7 @@ subscriptionRenewal = async(packages) => {
             }
         }
         
-        console.warn('Subscription not expire', subscriptionNotToRenew.length);
+        console.warn('Subscription to expire', subscriptionNotToRenew.length);
         console.warn('Subscription to renew', subscriptionToRenew.length);
 
         for(let i = 0; i < subscriptionNotToRenew.length; i++) {
@@ -90,7 +90,8 @@ expire = async(subscription) => {
         consecutive_successive_bill_counts: 0,
         try_micro_charge_in_next_cycle: false,
         micro_price_point: 0,
-        amount_billed_today: 0
+        amount_billed_today: 0,
+        queued: false
     });
 
     let packageObj = await packageRepo.getPackage({_id: subscription.subscribed_package_id});
@@ -106,7 +107,7 @@ expire = async(subscription) => {
     history.operator_response = undefined;
     history.billing_status = 'expired';
     history.source = 'system';
-    history.operator = 'telenor';
+    history.operator = subscription.payment_source;
 
     await billingHistoryRepo.createBillingHistory(history);
 }

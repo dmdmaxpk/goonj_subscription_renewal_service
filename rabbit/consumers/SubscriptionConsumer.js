@@ -65,7 +65,7 @@ class SubscriptionConsumer {
                     subscription.is_affiliation_callback_executed === false &&
                     subscription.should_affiliation_callback_sent === true){
                     if((subscription.source === "HE" || subscription.source === "affiliate_web") && subscription.affiliate_mid != "1") {
-                        this.sendAffiliationCallback(subscription.affiliate_unique_transaction_id, subscription.affiliate_mid, user._id, subscription._id, mPackage._id, mPackage.paywall_id);
+                        this.sendAffiliationCallback(subscription.affiliate_unique_transaction_id, subscription.affiliate_mid, user.msisdn, user._id, subscription._id, mPackage._id, mPackage.paywall_id);
                     }
                 }
 
@@ -213,11 +213,12 @@ class SubscriptionConsumer {
         this.sendMessage(msisdn, message);
     }
 
-    async sendAffiliationCallback(tid, mid, user_id, subscription_id, package_id, paywall_id) {
+    async sendAffiliationCallback(tid, mid, msisdn, user_id, subscription_id, package_id, paywall_id) {
         let combinedId = tid + "*" +mid;
 
         let history = {};
         history.user_id = user_id;
+        history.msisdn = msisdn;
         history.paywall_id = paywall_id;
         history.subscription_id = subscription_id;
         history.package_id = package_id;
@@ -271,6 +272,7 @@ class SubscriptionConsumer {
         
         let history = {};
         history.user_id = user._id;
+        history.msisdn = user.msisdn;
         history.subscription_id = subscription._id;
         history.paywall_id = packageObj.paywall_id;
         history.package_id = subscription.subscribed_package_id;

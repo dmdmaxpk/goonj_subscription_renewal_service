@@ -44,7 +44,7 @@ var billingJob = new CronJob('*/3 * * * *', function() {
 billingJob.start();
 
 // at every hour local cron to mark user who are supposed to be charged
-var markRenewalsJob = new CronJob('20 * * * *', function() {
+var markRenewalsJob = new CronJob('0 * * * *', function() {
     axios.get(`http://localhost:${port}/cron/markRenewableUsers`).then(res => {
         console.log(res.data);
     }).catch(err =>{

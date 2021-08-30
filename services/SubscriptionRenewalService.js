@@ -128,6 +128,7 @@ renewSubscription = async(subscription, packages) => {
     let subscribedPackage = undefined;
 
     subscribedPackage = findPackage(subscription.subscribed_package_id, packages);
+    console.log('SUBSCRIBED PACKAGE', subscribedPackage);
 
     if(subscription.try_micro_charge_in_next_cycle === true && subscription.micro_price_point > 0){
         if(subscription.payment_source === 'easypaisa'){

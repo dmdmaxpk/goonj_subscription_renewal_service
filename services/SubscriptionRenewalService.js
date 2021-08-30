@@ -121,7 +121,7 @@ expire = async(subscription) => {
     await billingHistoryRepo.createBillingHistory(history);
 }
 
-findPackage = async(current_package, packages) => {
+findPackage = (current_package, packages) => {
     packages.forEach(elem => {
         if(elem._id === current_package){
             return elem;
@@ -135,7 +135,7 @@ renewSubscription = async(subscription, packages) => {
 
     console.log('subscription.subscribed_package_id', subscription.subscribed_package_id);
 
-    let subscribedPackage = await findPackage(subscription.subscribed_package_id, packages);
+    let subscribedPackage = findPackage(subscription.subscribed_package_id, packages);
     
     console.log('SUBSCRIBED PACKAGE', subscribedPackage);
 

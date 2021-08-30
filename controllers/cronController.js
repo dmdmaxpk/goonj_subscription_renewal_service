@@ -14,7 +14,7 @@ exports.markRenewableUserForcefully = async (req, res) =>  {
 }
 
 exports.renewSubscriptions = async (req, res) =>  {
-    let packages = await axios({method: 'get', url: 'https://api.goonj.pk/v2/package', headers: {'Content-Type': 'application/json' }
+    let packages = await axios({method: 'get', url: `${config.service.core_service}/package/all?slug=live`, headers: {'Content-Type': 'application/json' }
     }).then(function(response){
         return response.data;
     }).catch(function(err){

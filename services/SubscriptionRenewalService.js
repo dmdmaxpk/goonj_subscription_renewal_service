@@ -12,6 +12,8 @@ const rabbitMq = new RabbitMq().getInstance();
 const BillingHistoryRabbitMq = require('../rabbit/BillingHistoryRabbitMq');
 const billingHistoryRabbitMq = new BillingHistoryRabbitMq().getInstance();
 
+let count = 0;
+
 subscriptionRenewal = async(packages) => {
     try {
         ackCronitor('renew-subscriptions', 'run');
@@ -56,11 +58,14 @@ subscriptionRenewal = async(packages) => {
 
         let promises = [];
         for(let i = 0; i < subscriptionToRenew.length; i++){
-            promises = [...promises, await renewSubscription(subscriptionToRenew[i], packages)];
+            let promise = await renewSubscription(subscriptionToRenew[i], packages);
+            promises.push(promise);
         }
 
         await Promise.all(promises);
+        console.log('Total queued count: ', count);
         ackCronitor('renew-subscriptions', 'complete');
+        count = 0;
     } catch(err){
         console.log(err);
         ackCronitor('renew-subscriptions', 'fail');
@@ -121,14 +126,6 @@ expire = async(subscription) => {
     await billingHistoryRepo.createBillingHistory(history);
 }
 
-findPackage = (current_package, packages) => {
-    packages.forEach(elem => {
-        if(elem._id === current_package){
-            return elem;
-        }
-    })
-}
-
 renewSubscription = async(subscription, packages) => {
     let messageObj = {};
     subscription.subscribed_package_id = subscription.subscribed_package_id ? subscription.subscribed_package_id : 'QDfC'
@@ -174,8 +171,9 @@ renewSubscription = async(subscription, packages) => {
         messageObj.payment_source = subscription.payment_source;
         messageObj.ep_token = subscription.ep_token;
 
+        await subscriptionRepo.updateSubscription(subscription._id, {queued: true});
+        count += 1;
         rabbitMq.addInQueue(config.queueNames.subscriptionDispatcher, messageObj);
-        subscriptionRepo.updateSubscription(subscription._id, {queued: true});
         
         console.log(subscription._id, ' added in queue');
     }else{

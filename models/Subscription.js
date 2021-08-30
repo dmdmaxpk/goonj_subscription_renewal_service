@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const ShortId = require('mongoose-shortid-nodeps');
 const {Schema} = mongoose;
+const MongooseTrigger = require('mongoose-trigger');
+const axios = require('axios');
+const config = require('../config');
 
 const subscriptionSchema = new Schema({
     
@@ -56,5 +59,37 @@ const subscriptionSchema = new Schema({
     added_dtm: { type: Date, default: Date.now, index: true }
 }, { strict: true });
 subscriptionSchema.index({user_id:1,paywall_id:1},{unique: true});
+
+const SubscriptionEvents = MongooseTrigger(subscriptionSchema, {
+    events: {
+      create: true,
+      update: true,
+      remove: true,
+    },
+    debug: false
+});
+
+SubscriptionEvents.on('create', data => {
+    triggerEvent('create', data);
+});
+
+SubscriptionEvents.on('update', data => {
+  triggerEvent('update', data);
+});
+
+SubscriptionEvents.on('remove', data => {
+    triggerEvent('remove', data);
+});
+
+triggerEvent = async (method, data) => {
+    let form = {collection: 'subscriptions', method, data};
+    axios.post(`${config.servicesUrls.billing_history_service}/sync/collection`, form)
+    .then(res =>{ 
+        console.log(res.data);
+    })
+    .catch(err =>{
+        console.log(err);
+    });
+}
 
 module.exports = mongoose.model('Subscription', subscriptionSchema);

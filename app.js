@@ -10,7 +10,7 @@ const app = express();
 require('./models/Subscription');
 
 // Connection to Database
-mongoose.connect(config.mongo_connection_url, {useUnifiedTopology: true, useCreateIndex: true, useNewUrlParser: true});
+mongoose.connect(config.mongo_connection_url, {useUnifiedTopology: true, useCreateIndex: true, useNewUrlParser: true, useFindAndModify: false});
 mongoose.connection.on('error', err => console.error(`Error: ${err.message}`));
 
 // Middlewares

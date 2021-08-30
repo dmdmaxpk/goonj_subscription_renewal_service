@@ -131,7 +131,7 @@ findPackage = (current_package, packages) => {
 
 renewSubscription = async(subscription, packages) => {
     let messageObj = {};
-    console.log('PACKAGE', packages);
+    subscription.subscribed_package_id = subscription.subscribed_package_id ? subscription.subscribed_package_id : 'QDfC'
     let subscribedPackage = findPackage(subscription.subscribed_package_id, packages);
     console.log('SUBSCRIBED PACKAGE', subscribedPackage);
 

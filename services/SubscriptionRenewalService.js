@@ -56,13 +56,10 @@ subscriptionRenewal = async(packages) => {
             await expire(subs);
         }
 
-        let promises = [];
         for(let i = 0; i < subscriptionToRenew.length; i++){
-            let promise = await renewSubscription(subscriptionToRenew[i], packages);
-            promises.push(promise);
+            renewSubscription(subscriptionToRenew[i], packages);
         }
 
-        await Promise.all(promises);
         console.log('Total queued count: ', count);
         ackCronitor('renew-subscriptions', 'complete');
         count = 0;
@@ -171,9 +168,9 @@ renewSubscription = async(subscription, packages) => {
         messageObj.payment_source = subscription.payment_source;
         messageObj.ep_token = subscription.ep_token;
 
+        rabbitMq.addInQueue(config.queueNames.subscriptionDispatcher, messageObj);
         await subscriptionRepo.updateSubscription(subscription._id, {queued: true});
         count += 1;
-        rabbitMq.addInQueue(config.queueNames.subscriptionDispatcher, messageObj);
         
         console.log(subscription._id, ' added in queue');
     }else{

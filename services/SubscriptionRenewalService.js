@@ -135,7 +135,12 @@ renewSubscription = async(subscription, packages) => {
 
     console.log('subscription.subscribed_package_id', subscription.subscribed_package_id);
 
-    let subscribedPackage = findPackage(subscription.subscribed_package_id, packages);
+    let subscribedPackage = undefined;
+
+    subscribedPackage = packages.filter((package) => {
+        return package._id === subscription.subscribed_package_id
+    })[0];
+
     
     console.log('SUBSCRIBED PACKAGE', subscribedPackage);
 

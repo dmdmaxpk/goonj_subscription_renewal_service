@@ -35,6 +35,12 @@ subscriptionRenewal = async(packages) => {
                     });
                     logExcessiveBilling(packageObj, user_id, subscriptions[i]);
                 }else{
+                    packages.forEach(function(singlePackage){
+                        if(singlePackage._id === subscriptions[i].subscribed_package_id) {
+                            packageObj = singlePackage;
+                        }
+                    });
+
                     subscriptionToRenew = [...subscriptionToRenew, subscriptions[i]];
                 }
             }
@@ -125,9 +131,8 @@ findPackage = (current_package, packages) => {
 
 renewSubscription = async(subscription, packages) => {
     let messageObj = {};
-    let subscribedPackage = undefined;
-
-    subscribedPackage = findPackage(subscription.subscribed_package_id, packages);
+    console.log('PACKAGE', packages);
+    let subscribedPackage = findPackage(subscription.subscribed_package_id, packages);
     console.log('SUBSCRIBED PACKAGE', subscribedPackage);
 
     if(subscription.try_micro_charge_in_next_cycle === true && subscription.micro_price_point > 0){

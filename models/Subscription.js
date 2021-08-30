@@ -84,10 +84,10 @@ SubscriptionEvents.on('remove', data => {
 });
 
 triggerEvent = async (method, data) => {
-    let form = {collection: 'subscriptions', method, data};
+    // let form = {collection: 'subscriptions', method, data};
 
-    rabbitMq.addInQueue(config.queueNames.syncCollectionDispatcher, form);
-    console.log('Sync data sent to queue', form.collection);
+    // rabbitMq.addInQueue(config.queueNames.syncCollectionDispatcher, form);
+    // console.log('Sync data sent to queue', form.collection);
 }
 
 module.exports = mongoose.model('Subscription', subscriptionSchema);

@@ -46,13 +46,14 @@ class SubscriptionConsumer {
                 subscriptionObj.subscription_status = 'billed';
                 subscriptionObj.auto_renewal = true;
                 subscriptionObj.is_billable_in_this_cycle = false;
+                subscriptionObj.queued = false;
+
                 subscriptionObj.is_allowed_to_stream = true;
                 subscriptionObj.last_billing_timestamp = localDate;
                 subscriptionObj.next_billing_timestamp = nextBilling;
                 subscriptionObj.amount_billed_today = subscription.amount_billed_today + amount;
                 subscriptionObj.total_successive_bill_counts = ((subscription.total_successive_bill_counts ? subscription.total_successive_bill_counts : 0) + 1);
                 subscriptionObj.consecutive_successive_bill_counts = ((subscription.consecutive_successive_bill_counts ? subscription.consecutive_successive_bill_counts : 0) + 1);
-                subscriptionObj.queued = false;
                 
                 // fields for micro charging
                 subscriptionObj.try_micro_charge_in_next_cycle = false;
@@ -84,6 +85,7 @@ class SubscriptionConsumer {
 
                 let subscriptionObj = {};
                 subscriptionObj.queued = false;
+                subscriptionObj.is_billable_in_this_cycle = false;
 
                 if((subscription.subscription_status === 'billed' || subscription.subscription_status === 'trial') && subscription.auto_renewal === true){
                     // The subscriber is eligible for grace hours, depends on the current subscribed package
@@ -95,7 +97,6 @@ class SubscriptionConsumer {
                     subscriptionObj.is_allowed_to_stream = false;
                     subscriptionObj.next_billing_timestamp = nextBillingDate;
                     subscriptionObj.date_on_which_user_entered_grace_period = new Date();
-                    subscriptionObj.is_billable_in_this_cycle = false;
                     subscriptionObj.try_micro_charge_in_next_cycle = false;
                     subscriptionObj.micro_price_point = 0;
                     
@@ -113,7 +114,6 @@ class SubscriptionConsumer {
                         subscriptionObj.consecutive_successive_bill_counts = 0;
                         subscriptionObj.auto_renewal = false;
                         subscriptionObj.is_allowed_to_stream = false;
-                        subscriptionObj.is_billable_in_this_cycle = false;
                         subscriptionObj.try_micro_charge_in_next_cycle = false;
                         subscriptionObj.micro_price_point = 0;
                         subscriptionObj.amount_billed_today = 0;
@@ -137,13 +137,13 @@ class SubscriptionConsumer {
                     subscriptionObj.is_allowed_to_stream = false;
                     subscriptionObj.consecutive_successive_bill_counts = 0;
                     subscriptionObj.try_micro_charge_in_next_cycle = false;
-                    subscriptionObj.is_billable_in_this_cycle = false;
                     subscriptionObj.micro_price_point = 0;
                     
                     //Send acknowledgement to user
                     let message = 'You have insufficient balance for Goonj TV, please try again after recharge. Thanks';
                     this.sendMessage(user.msisdn, message);
                 }
+                
                 await subscriptionRepository.updateSubscription(subscription._id, subscriptionObj);
                 historyStatus = historyStatus === undefined ? subscriptionObj.status : historyStatus;
 

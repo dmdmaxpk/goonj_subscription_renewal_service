@@ -121,7 +121,7 @@ expire = async(subscription) => {
     await billingHistoryRepo.createBillingHistory(history);
 }
 
-findPackage = (current_package, packages) => {
+findPackage = async(current_package, packages) => {
     packages.forEach(elem => {
         if(elem._id === current_package){
             return elem;
@@ -132,7 +132,11 @@ findPackage = (current_package, packages) => {
 renewSubscription = async(subscription, packages) => {
     let messageObj = {};
     subscription.subscribed_package_id = subscription.subscribed_package_id ? subscription.subscribed_package_id : 'QDfC'
-    let subscribedPackage = findPackage(subscription.subscribed_package_id, packages);
+
+    console.log('subscription.subscribed_package_id', subscription.subscribed_package_id);
+
+    let subscribedPackage = await findPackage(subscription.subscribed_package_id, packages);
+    
     console.log('SUBSCRIBED PACKAGE', subscribedPackage);
 
     if(subscription.try_micro_charge_in_next_cycle === true && subscription.micro_price_point > 0){

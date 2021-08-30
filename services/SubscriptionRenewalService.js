@@ -133,16 +133,11 @@ renewSubscription = async(subscription, packages) => {
     let messageObj = {};
     subscription.subscribed_package_id = subscription.subscribed_package_id ? subscription.subscribed_package_id : 'QDfC'
 
-    console.log('subscription.subscribed_package_id', subscription.subscribed_package_id);
-
     let subscribedPackage = undefined;
 
     subscribedPackage = packages.filter((package) => {
         return package._id === subscription.subscribed_package_id
     })[0];
-
-    
-    console.log('SUBSCRIBED PACKAGE', subscribedPackage);
 
     if(subscription.try_micro_charge_in_next_cycle === true && subscription.micro_price_point > 0){
         if(subscription.payment_source === 'easypaisa'){

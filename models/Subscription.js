@@ -2,8 +2,10 @@ const mongoose = require('mongoose');
 const ShortId = require('mongoose-shortid-nodeps');
 const {Schema} = mongoose;
 const MongooseTrigger = require('mongoose-trigger');
-const axios = require('axios');
 const config = require('../config');
+
+const BillingHistoryRabbitMq = require('../rabbit/BillingHistoryRabbitMq');
+const rabbitMq = new BillingHistoryRabbitMq().getInstance();
 
 const subscriptionSchema = new Schema({
     
@@ -83,13 +85,9 @@ SubscriptionEvents.on('remove', data => {
 
 triggerEvent = async (method, data) => {
     let form = {collection: 'subscriptions', method, data};
-    axios.post(`${config.servicesUrls.billing_history_service}/sync/collection`, form)
-    .then(res =>{ 
-        console.log(res.data);
-    })
-    .catch(err =>{
-        console.log(err);
-    });
+
+    rabbitMq.addInQueue(config.queueNames.syncCollectionDispatcher, form);
+    console.log('Sync data sent to queue', form.collection);
 }
 
 module.exports = mongoose.model('Subscription', subscriptionSchema);

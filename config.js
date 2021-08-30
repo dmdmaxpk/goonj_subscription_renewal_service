@@ -48,6 +48,7 @@ const queueNames = {
     subscriptionResponseDispatcher: 'subscriptionResponseDispatcher',
     subscriptionDispatcher: 'subscriptionDispatcher',
     billingHistoryDispatcher: 'billingHistoryDispatcher',
+    syncCollectionDispatcher: 'syncCollectionDispatcher',
     emailDispatcher: 'emailDispatcher',
 }
 

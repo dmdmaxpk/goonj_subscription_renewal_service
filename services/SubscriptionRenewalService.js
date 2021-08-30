@@ -115,13 +115,19 @@ expire = async(subscription) => {
     await billingHistoryRepo.createBillingHistory(history);
 }
 
+findPackage = (current_package, packages) => {
+    packages.forEach(elem => {
+        if(elem._id === current_package){
+            return elem;
+        }
+    })
+}
+
 renewSubscription = async(subscription, packages) => {
     let messageObj = {};
     let subscribedPackage = undefined;
 
-    subscribedPackage = packages.filter((package) => {
-        return package._id === subscription.subscribed_package_id
-    })[0];
+    subscribedPackage = findPackage(subscription.subscribed_package_id, packages);
 
     if(subscription.try_micro_charge_in_next_cycle === true && subscription.micro_price_point > 0){
         if(subscription.payment_source === 'easypaisa'){

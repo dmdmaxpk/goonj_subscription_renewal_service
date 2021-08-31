@@ -61,15 +61,6 @@ class SubscriptionConsumer {
                 
                 await subscriptionRepository.updateSubscription(subscription._id, subscriptionObj);
             
-                // // Check for the affiliation callback
-                // if(subscription.affiliate_unique_transaction_id && subscription.affiliate_mid &&
-                //     subscription.is_affiliation_callback_executed === false &&
-                //     subscription.should_affiliation_callback_sent === true){
-                //     if((subscription.source === "HE" || subscription.source === "affiliate_web") && subscription.affiliate_mid != "1") {
-                //         this.sendAffiliationCallback(subscription.affiliate_unique_transaction_id, subscription.affiliate_mid, user.msisdn, user._id, subscription._id, mPackage._id, mPackage.paywall_id);
-                //     }
-                // }
-
                 if(micro_charge === true && amount > 0){
                     console.log('micro charge success');
                     this.sendMicroChargeMessage(user.msisdn, mPackage.display_price_point, amount, mPackage.package_name)
@@ -211,61 +202,6 @@ class SubscriptionConsumer {
         //Send acknowldement to user
         let message = "You've got "+percentage+"% discount on "+packageName+".  Numainday se baat k liye 727200 milayein.";
         this.sendMessage(msisdn, message);
-    }
-
-    async sendAffiliationCallback(tid, mid, msisdn, user_id, subscription_id, package_id, paywall_id) {
-        let combinedId = tid + "*" +mid;
-
-        let history = {};
-        history.user_id = user_id;
-        history.msisdn = msisdn;
-        history.paywall_id = paywall_id;
-        history.subscription_id = subscription_id;
-        history.package_id = package_id;
-        history.transaction_id = combinedId;
-        history.operator = 'telenor';
-
-        console.log(`sending affiliate marketing callback having TID - ${tid} - MID ${mid}`);
-        this.sendCallBackToIdeation(mid, tid).then(async (fulfilled) => {
-            console.log(`Successfully sent affiliate marketing callback having TID - ${tid} - MID ${mid} - ideation response - ${fulfilled}`);
-            await subscriptionRepository.updateSubscription(subscription_id, {is_affiliation_callback_executed: true});
-            history.operator_response = fulfilled;
-            history.billing_status = "Affiliate callback sent";
-            this.sendHistory(history);
-        }).catch(async  (error) => {
-            console.log(`Affiliate - Marketing - Callback - Error - Having TID - ${tid} - MID ${mid}`, error);
-            history.operator_response = error.response.data;
-            history.billing_status = "Affiliate callback error";
-            this.sendHistory(history);
-        });
-    }
-
-    async sendCallBackToIdeation(mid, tid)  {
-        var url = undefined; 
-        if (mid === "1569") {
-            url = config.ideationUrls.ideation_call_back_url + `p?mid=${mid}&tid=${tid}`;
-        } else if (mid === "goonj"){
-            url = config.ideationUrls.ideation_call_back_url_2 + `?txid=${tid}`;
-        } else if (mid === "aff3" || mid === "aff3a"){
-            url = config.ideationUrls.ideation_call_back_url_3 + `${tid}`;
-        }
-
-        if(url){
-            console.log("ideation callback url:", url)
-            return new Promise(function(resolve, reject) {
-                axios({
-                    method: 'post',
-                    url: url,
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded' }
-                }).then(function(response){
-                    resolve(response.data);
-                }).catch(function(err){
-                    reject(err);
-                });
-            });
-        }else{
-            console.warn('Invalid mid found');
-        }
     }
 
     assembleAndSendBillingHistory(user, subscription, packageObj, api_response, billing_status, response_time, transaction_id, micro_charge, price, expiry_source = undefined) {

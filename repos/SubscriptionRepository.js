@@ -96,7 +96,7 @@ class SubscriptionRepository {
                     queued:false
                 }
             },{
-                $limit: 20000
+                $limit: 18000
             }
         ]);
         return results;

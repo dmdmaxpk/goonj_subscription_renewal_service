@@ -80,7 +80,8 @@ class SubscriptionConsumer {
 
                 if((subscription.subscription_status === 'billed' || subscription.subscription_status === 'trial') && subscription.auto_renewal === true){
                     // The subscriber is eligible for grace hours, depends on the current subscribed package
-        
+                    historyStatus = 'graced';
+
                     let nextBillingDate = new Date();
                     nextBillingDate.setHours(nextBillingDate.getHours() + config.time_between_billing_attempts_hours);
                     
@@ -101,6 +102,7 @@ class SubscriptionConsumer {
                     console.log(`${subscription._id} spent ${hoursSpentInGracePeriod} hours in grace period`);
             
                     if (hoursSpentInGracePeriod > mPackage.grace_hours){
+                        historyStatus = 'expired';
                         subscriptionObj.subscription_status = 'expired';
                         subscriptionObj.consecutive_successive_bill_counts = 0;
                         subscriptionObj.auto_renewal = false;
@@ -115,8 +117,8 @@ class SubscriptionConsumer {
                         let link = 'https://www.goonj.pk/goonjplus/subscribe';
                         let message = 'You package to Goonj TV has expired, click below link to subscribe again.\n'+link;
                         this.sendMessage(user.msisdn, message);
-                        historyStatus = "expired";
                     }else if(mPackage.is_micro_charge_allowed === true){
+                        historyStatus = 'graced';
                         subscriptionObj = this.activateMicroCharging(subscription, mPackage, subscriptionObj);
 
                         console.log("micro charging activated for subsription id: ", subscription._id);
@@ -136,8 +138,6 @@ class SubscriptionConsumer {
                 }
                 
                 await subscriptionRepository.updateSubscription(subscription._id, subscriptionObj);
-                historyStatus = historyStatus === undefined ? subscriptionObj.status : historyStatus;
-
                 this.assembleAndSendBillingHistory(user, subscription, mPackage, api_response.full_api_response, historyStatus, response_time, transaction_id, micro_charge, amount, expiry_source)
             }
             return 'Done';
@@ -214,7 +214,7 @@ class SubscriptionConsumer {
         history.package_id = subscription.subscribed_package_id;
         history.transaction_id = transaction_id;
         history.operator_response = api_response;
-        history.billing_status = billing_status === 'success' ? 'Success' : 'Failed';
+        history.billing_status = billing_status === 'success' ? 'Success' : billing_status;
         history.response_time = response_time;
         history.source = expiry_source === undefined? subscription.source : expiry_source;
         history.operator = subscription.payment_source ? subscription.payment_source : 'telenor';

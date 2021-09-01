@@ -109,12 +109,12 @@ class SubscriptionRepository {
         return results;
     }
     
-    async updateSubscription (subscription_id, postData)  {
+    async updateSubscription(subscription_id, postData)  {
         const query = { _id: subscription_id };
         postData.last_modified = new Date();
-
         try {
-            await Subscription.findOneAndUpdate(query, postData);
+            let updated = await Subscription.findOneAndUpdate(query, postData, {new: true});
+            return updated;
         } catch(error) {
             console.log(error);
         }
@@ -157,13 +157,8 @@ class SubscriptionRepository {
     async markSubscriptionInactive (subscription_id)  {
         if (subscription_id) { 
             const query = { _id: subscription_id };
-            const result = await Subscription.findOneAndUpdate(query, { $set: { active: false } });
-            if (result.nModified === 0) {
-                return undefined;
-            }else{
-                let subscription = await this.getSubscription(subscription_id);
-                return subscription;
-            }
+            const result = await Subscription.findOneAndUpdate(query, { $set: { active: false } }, {new: true});
+            return result;
         } else {
              return undefined;
         }
@@ -172,13 +167,8 @@ class SubscriptionRepository {
     async unsubscribe (subscription_id)  {
         if (subscription_id) { 
             const query = { _id: subscription_id };
-            const result = await Subscription.findOneAndUpdate(query, { $set: { auto_renewal: false, subscription_status: 'expired' } });
-            if (result.nModified === 0) {
-                return undefined;
-            }else{
-                let subscription = await this.getSubscription(subscription_id);
-                return subscription;
-            }
+            const result = await Subscription.findOneAndUpdate(query, { $set: { auto_renewal: false, subscription_status: 'expired' } }, {new: true});
+            return result;
         } else {
              return undefined;
         }

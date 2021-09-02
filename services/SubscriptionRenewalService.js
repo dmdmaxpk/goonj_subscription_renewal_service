@@ -82,6 +82,7 @@ logExcessiveBilling = async (packageObj, user_id, subscription) => {
     history.subscription_id = subscription._id;
     history.operator_response = {"message": `Subscription ${subscription._id} has exceeded their billing limit.`};
     history.billing_status = "billing_exceeded";
+    console.log('$$:',JSON.stringify(history),':$$');
     billingHistoryRabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
 
     // Shoot an email

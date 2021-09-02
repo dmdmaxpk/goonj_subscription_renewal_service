@@ -225,8 +225,8 @@ class SubscriptionConsumer {
     }
 
     sendHistory(history){
+        console.log('$$:',JSON.stringify(history),':$$');
         rabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
-        console.log('History sent to queue:', history.operator_response);
     }
 
     sendMessage(msisdn, message){

@@ -27,6 +27,11 @@ const subscriptionSchema = new Schema({
     total_successive_bill_counts: Number,
     consecutive_successive_bill_counts: Number,
 
+    // priority 0 means no priority has been set so far.
+    // priority 1 for high and
+    // priority 2 for low
+    priority: { type: Number, default: 0, index: true },
+
     // Sources - android/ios/web/
     source: {type: String, default: 'android', index: true},
 

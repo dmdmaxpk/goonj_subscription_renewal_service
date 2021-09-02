@@ -54,7 +54,8 @@ class SubscriptionConsumer {
                 subscriptionObj.amount_billed_today = subscription.amount_billed_today + amount;
                 subscriptionObj.total_successive_bill_counts = ((subscription.total_successive_bill_counts ? subscription.total_successive_bill_counts : 0) + 1);
                 subscriptionObj.consecutive_successive_bill_counts = ((subscription.consecutive_successive_bill_counts ? subscription.consecutive_successive_bill_counts : 0) + 1);
-                
+                subscriptionObj.priority = 0;
+
                 // fields for micro charging
                 subscriptionObj.try_micro_charge_in_next_cycle = false;
                 subscriptionObj.micro_price_point = 0;
@@ -91,7 +92,7 @@ class SubscriptionConsumer {
                     subscriptionObj.date_on_which_user_entered_grace_period = new Date();
                     subscriptionObj.try_micro_charge_in_next_cycle = false;
                     subscriptionObj.micro_price_point = 0;
-                    
+                    subscriptionObj.priority = 0;
         
                 }else if(subscription.subscription_status === 'graced' && subscription.auto_renewal === true){
                     // Already in grace, check if given time has been passed in grace, stop streaming
@@ -110,19 +111,48 @@ class SubscriptionConsumer {
                         subscriptionObj.try_micro_charge_in_next_cycle = false;
                         subscriptionObj.micro_price_point = 0;
                         subscriptionObj.amount_billed_today = 0;
-        
+                        subscriptionObj.priority = 0;
                         expiry_source = "system-after-grace-end";
         
                         //Send acknowledgement to user
                         let link = 'https://www.goonj.pk/goonjplus/subscribe';
                         let message = 'You package to Goonj TV has expired, click below link to subscribe again.\n'+link;
                         this.sendMessage(user.msisdn, message);
-                    }else if(mPackage.is_micro_charge_allowed === true){
-                        historyStatus = 'graced';
-                        subscriptionObj = this.activateMicroCharging(subscription, mPackage, subscriptionObj);
-
-                        console.log("micro charging activated for subsription id: ", subscription._id);
+                    }else if(mPackage.is_micro_charge_allowed === true && hoursSpentInGracePeriod > 8 && hoursSpentInGracePeriod <= 24){
+                        console.log("Micro charging activated for: ",subscription._id);
                         subscriptionObj.subscription_status = 'graced';
+                        historyStatus = "graced";
+        
+                        subscriptionObj = this.activateMicroCharging(subscription, mPackage, subscriptionObj);
+                        console.log("Micro Charging Activated Subscription Object Returned:",subscriptionObj);
+                    }else{
+                        let nextBillingDate = new Date();
+                        nextBillingDate.setHours(nextBillingDate.getHours() + config.time_between_billing_attempts_hours);
+                        
+                        subscriptionObj.subscription_status = 'graced';
+                        subscriptionObj.next_billing_timestamp = nextBillingDate;
+                        historyStatus = "graced";
+            
+                        //TODO set is_allowed_to_stream to false if 24 hours have passed in grace period
+                        let last_billing_timestamp = moment(subscription.last_billing_timestamp);
+                        var hours;
+            
+                        if (subscription.last_billing_timestamp) {
+                            let now = moment()
+                            let difference = moment.duration(now.diff(last_billing_timestamp));
+                            hours = difference.asHours();
+                        } else {
+                            hours = hoursSpentInGracePeriod;
+                        }
+                        console.log("Hours since last payment", hours);
+                        
+                        if(hours > 24){
+                            subscriptionObj.is_allowed_to_stream = false;
+                        }
+
+                        subscriptionObj.try_micro_charge_in_next_cycle = false;
+                        subscriptionObj.micro_price_point = 0;
+                        subscriptionObj.priority = 0;
                     }
                 }else{
                     historyStatus = "payment request tried, failed due to insufficient balance.";
@@ -131,7 +161,8 @@ class SubscriptionConsumer {
                     subscriptionObj.consecutive_successive_bill_counts = 0;
                     subscriptionObj.try_micro_charge_in_next_cycle = false;
                     subscriptionObj.micro_price_point = 0;
-                    
+                    subscriptionObj.priority = 0;
+
                     //Send acknowledgement to user
                     let message = 'You have insufficient balance for Goonj TV, please try again after recharge. Thanks';
                     this.sendMessage(user.msisdn, message);
@@ -160,18 +191,22 @@ class SubscriptionConsumer {
             if(index > 0){
                 tempSubObj.try_micro_charge_in_next_cycle = true;
                 tempSubObj.micro_price_point = micro_price_points[--index];
+                tempSubObj.priority = 2;
             }else if(index === -1){
                 tempSubObj.try_micro_charge_in_next_cycle = true;
                 tempSubObj.micro_price_point = micro_price_points[micro_price_points.length - 1];
+                tempSubObj.priority = 2;
             }else{
                 tempSubObj.try_micro_charge_in_next_cycle = false;
                 tempSubObj.micro_price_point = 0;
                 tempSubObj.is_billable_in_this_cycle = false;
+                tempSubObj.priority = 0;
             }
         }else{
             // It means micro tying first micro charge attempt
             tempSubObj.try_micro_charge_in_next_cycle = true;
             tempSubObj.micro_price_point = micro_price_points[micro_price_points.length - 1];
+            tempSubObj.priority = 2;
         }
 
         return tempSubObj;

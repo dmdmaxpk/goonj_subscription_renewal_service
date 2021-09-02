@@ -103,6 +103,7 @@ expire = async(subscription) => {
         try_micro_charge_in_next_cycle: false,
         micro_price_point: 0,
         amount_billed_today: 0,
+        priority: 0,
         queued: false
     });
 

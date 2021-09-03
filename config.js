@@ -24,8 +24,8 @@ const codes = {
     code_otp_not_found: 17
 }
 
-const tp_billing_cycle_hours = [1,4,7,10,13,16,19,22];
-const ep_billing_cycle_hours = [9,15,21];
+const tp_billing_cycle_hours = [1,5,8,11,14,17,20,22];
+const ep_billing_cycle_hours = [4,10,16];
 
 
 const servicesUrls = {

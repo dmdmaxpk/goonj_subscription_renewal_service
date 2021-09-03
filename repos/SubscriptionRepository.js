@@ -255,7 +255,8 @@ class SubscriptionRepository {
     async getCountOfSubscriptionToMark(operator){
         let now = moment();
         let endOfDay = now.endOf('day').tz("Asia/Karachi");
-    
+        console.log('End of Day', endOfDay, operator);
+
         let count = await Subscription.countDocuments(
             {$or:[{subscription_status:'billed'},
             {subscription_status:'graced'},

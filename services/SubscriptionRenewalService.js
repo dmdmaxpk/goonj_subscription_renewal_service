@@ -187,17 +187,18 @@ markRenewableUser = async() => {
         let hour = now.hours();
         if (config.tp_billing_cycle_hours.includes(hour)) {
             console.log(`Billing cycle for telenor at ${hour} O'Clock`);
-            await mark('telenor');
-            validate();
+            mark('telenor');
         }else if(config.ep_billing_cycle_hours.includes(hour)){
             console.log(`Billing cycle for easypaisa at ${hour} O'Clock`);
-            await mark('easypaisa');
+            mark('easypaisa');
         } else {
             console.log(`No billing cycle for telenor/easypaisa at ${hour} O'Clock`);
         }
+        return 'done';
     } catch(err) {
         ackCronitor('mark-subscriptions-to-renew', 'fail');
         console.log(`Billing cycle error`, err);
+        throw err;
     }
 }
 
@@ -226,6 +227,7 @@ mark = async(operator) => {
         await getMarkUsersPromise(reminders, lastId, operator);
     }
 
+    validateResults();
     ackCronitor('mark-subscriptions-to-renew', 'complete');
 }
 
@@ -241,7 +243,7 @@ markRenewableUserForcefully = async() => {
     }
 }
 
-validate = async() => {
+validateResults = async() => {
     console.log("Validating...");
 
     let countThreshold = 350000;

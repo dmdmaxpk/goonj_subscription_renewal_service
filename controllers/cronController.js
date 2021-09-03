@@ -3,8 +3,12 @@ const config = require('../config');
 const axios = require('axios');
 
 exports.markRenewableUsers = async (req, res) =>  {
-    await renewalService.markRenewableUser();
-    res.send({status: config.codes.code_success, message: 'MarkRenewableUsers Executed'});
+    try{
+        let response = await renewalService.markRenewableUser();
+        res.send({status: config.codes.code_success, message: response});
+    }catch(err){
+        throw err;
+    }
 }
 
 exports.markRenewableUserForcefully = async (req, res) =>  {

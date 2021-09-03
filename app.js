@@ -9,6 +9,8 @@ const app = express();
 // Import database models
 require('./models/Subscription');
 
+const helper = require('./helper/helper');
+
 // Connection to Database
 mongoose.connect(config.mongo_connection_url, {useUnifiedTopology: true, useCreateIndex: true, useNewUrlParser: true, useFindAndModify: false});
 mongoose.connection.on('error', err => console.error(`Error: ${err.message}`));
@@ -45,11 +47,16 @@ billingJob.start();
 
 // at every hour local cron to mark user who are supposed to be charged
 var markRenewalsJob = new CronJob('0 * * * *', function() {
-    axios.get(`http://localhost:${port}/cron/markRenewableUsers`).then(res => {
-        console.log(res.data);
-    }).catch(err =>{
-        console.log('error while running mark renewal cron:', err);
-    });
+    try{
+        axios.get(`http://localhost:${port}/cron/markRenewableUsers`).then(res => {
+            console.log(res.data);
+        }).catch(err =>{
+            helper.billingCycleFailedToExecute();
+            console.log('error while running mark renewal cron:', err);
+        });
+    }catch(e){
+        helper.billingCycleFailedToExecute();
+    }
 }, null, true, 'Asia/Karachi');
 markRenewalsJob.start();
 

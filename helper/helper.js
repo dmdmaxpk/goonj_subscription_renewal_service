@@ -33,7 +33,7 @@ class Helper {
         });
     }
 
-    static sendMessage = (msisdn) => {
+    static sendMessage(msisdn) {
         return new Promise(async(resolve, reject) => {
             let response = await axios.post(`${config.servicesUrls.message_service}/message/send-directly`, {message: 'Billing cycle failed to execue, please check on priority. Thanks', msisdn})
             .then(res =>{ 

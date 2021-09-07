@@ -227,7 +227,10 @@ mark = async(operator) => {
         await getMarkUsersPromise(reminders, lastId, operator);
     }
 
-    validateResults();
+    if(operator === 'telenor'){
+        validateResults();
+    }
+    
     ackCronitor('mark-subscriptions-to-renew', 'complete');
 }
 

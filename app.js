@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const config = require('./config');
 const axios = require('axios');
 const app = express();
-const moment = require("moment");
+const moment = require("moment-timezone");
 
 // Import database models
 require('./models/Subscription');

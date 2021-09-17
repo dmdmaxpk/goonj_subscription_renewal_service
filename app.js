@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const config = require('./config');
 const axios = require('axios');
 const app = express();
+const moment = require("moment");
 
 // Import database models
 require('./models/Subscription');
@@ -60,8 +61,12 @@ var markRenewalsJob = new CronJob('0 * * * *', function() {
 }, null, true, 'Asia/Karachi');
 markRenewalsJob.start();
 
-// Start Server
+let now = moment();
+let endOfDay = now.endOf('day').tz("Asia/Karachi");
+console.log('End of Day', endOfDay);
 
+
+// Start Server
 app.listen(port, () => {
     console.log(`Subscription Renewal Service Running On Port ${port}`);
     rabbitMq.initServer((error, response) => {

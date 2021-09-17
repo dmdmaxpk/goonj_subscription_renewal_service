@@ -63,6 +63,9 @@ markRenewalsJob.start();
 
 let now = moment();
 let endOfDay = now.endOf('day').tz("Asia/Karachi");
+endOfDay.hour(23)
+endOfDay.minutes(59);
+endOfDay.seconds(59);
 console.log('End of Day', endOfDay);
 
 

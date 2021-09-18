@@ -25,7 +25,7 @@ const codes = {
 }
 
 //const tp_billing_cycle_hours = [1,5,8,11,14,17,20,22];
-const tp_billing_cycle_hours = [1,5,8,20,22];
+const tp_billing_cycle_hours = [1,5,8];
 const ep_billing_cycle_hours = [4,10,16];
 
 

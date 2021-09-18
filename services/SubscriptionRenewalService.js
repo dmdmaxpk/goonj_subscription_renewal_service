@@ -70,7 +70,7 @@ subscriptionRenewal = async(packages) => {
 logExcessiveBilling = async (packageObj, user_id, subscription) => {
 
     // Update subscription
-    await subscriptionRepo.updateSubscription(subscription._id, {queued: false, is_billable_in_this_cycle: false});
+    await subscriptionRepo.updateSubscription(subscription._id, {active: false, queued: false, is_billable_in_this_cycle: false});
 
     // create billing history history
     let history = {};

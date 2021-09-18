@@ -88,7 +88,7 @@ logExcessiveBilling = async (packageObj, user_id, subscription) => {
     // Shoot an email
     let messageObj = {};
     // messageObj.to = ["paywall@dmdmax.com.pk"];
-    messageObj.to = ["muhammad.azam@dmdmax.com", "farhan.ali@dmdmax.com"]; // for testing
+    messageObj.to = ["muhammad.azam@dmdmax.com", "farhan.ali@dmdmax.com", "taha@dmdmax.com", "usama.shamim@dmdmax.com"]; // for testing
     messageObj.subject = 'Excessive Charge Email';
     messageObj.text = `Subscription id ${subscription._id} is trying to charge on a price greater than package price.`;
     rabbitMq.addInQueue(config.queueNames.emailDispatcher, messageObj);

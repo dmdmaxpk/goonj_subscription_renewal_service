@@ -27,22 +27,20 @@ subscriptionRenewal = async(packages) => {
             if(subscriptions[i].auto_renewal === false){
                 subscriptionNotToRenew = [...subscriptionNotToRenew, subscriptions[i]];
             }else {
-                if((subscriptions[i].subscribed_package_id === 'QDfC' && subscriptions[i].amount_billed_today > config.max_amount_billed_today_for_daily) || (subscriptions[i].subscribed_package_id === 'QDfG' && subscriptions[i].amount_billed_today > config.max_amount_billed_today_for_weekly)){
+                let packageObj = null;
+                packages.forEach(function(singlePackage){
+                    if(singlePackage._id === subscriptions[i].subscribed_package_id){
+                        packageObj = singlePackage;
+                    }
+                });
+
+                let new_amount_billed_today_will_be = (subscriptions[i].amount_billed_today + packageObj.price_point_pkr)
+                if((subscriptions[i].subscribed_package_id === 'QDfC' && new_amount_billed_today_will_be > config.max_amount_billed_today_for_daily) || (subscriptions[i].subscribed_package_id === 'QDfG' && new_amount_billed_today_will_be > config.max_amount_billed_today_for_weekly)){
                     // initiate excessive billing email and do the necessary actions
 
                     let user_id = subscriptions[i].user_id;
-                    let packageObj = null;
-                    packages.forEach(function(singlePackage){
-                        if(singlePackage._id === subscriptions[i].subscribed_package_id) packageObj = singlePackage;
-                    });
                     logExcessiveBilling(packageObj, user_id, subscriptions[i]);
                 }else{
-                    packages.forEach(function(singlePackage){
-                        if(singlePackage._id === subscriptions[i].subscribed_package_id) {
-                            packageObj = singlePackage;
-                        }
-                    });
-
                     subscriptionToRenew = [...subscriptionToRenew, subscriptions[i]];
                 }
             }
@@ -72,7 +70,7 @@ subscriptionRenewal = async(packages) => {
 logExcessiveBilling = async (packageObj, user_id, subscription) => {
 
     // Update subscription
-    await subscriptionRepo.updateSubscription(subscription._id, {active:false, queued:false, is_billable_in_this_cycle: false});
+    await subscriptionRepo.updateSubscription(subscription._id, {queued: false, is_billable_in_this_cycle: false});
 
     // create billing history history
     let history = {};

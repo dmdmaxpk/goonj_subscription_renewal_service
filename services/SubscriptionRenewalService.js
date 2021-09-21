@@ -255,7 +255,7 @@ validateResults = async() => {
         axios.post(`${config.servicesUrls.message_service}/message/email`, {
             subject: 'Billing Cycle Count Lower Than Expected', 
             text: `Total billable cycle count is ${totalCount}, which is lower than threshold ${countThreshold}. Please check asap!`,
-            to: ['paywall@dmdmax.com.pk', 'usama.shamim@dmdmax.com', 'taha@dmdmdax.com', 'nauman@dmdmax.com', 'muhammad.azam@dmdmax.com']
+            to: ['paywall@dmdmax.com.pk', 'usama.shamim@dmdmax.com', 'taha@dmdmax.com', 'nauman@dmdmax.com', 'muhammad.azam@dmdmax.com']
         }).then(res => {
             console.log('email sent with response: ', res.data);
         }).catch(err => {

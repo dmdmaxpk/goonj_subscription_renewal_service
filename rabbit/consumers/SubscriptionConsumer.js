@@ -240,7 +240,11 @@ class SubscriptionConsumer {
     }
 
     assembleAndSendBillingHistory(user, subscription, packageObj, api_response, billing_status, response_time, transaction_id, micro_charge, price, expiry_source = undefined) {
-        
+
+        // billing local dtm
+        let serverDate = new Date();
+        let localDate = helper.setDateWithTimezone(serverDate);
+
         let history = {};
         history.user_id = user._id;
         history.msisdn = user.msisdn;
@@ -255,6 +259,7 @@ class SubscriptionConsumer {
         history.operator = subscription.payment_source ? subscription.payment_source : 'telenor';
         history.price = price;
         history.micro_charge = micro_charge;
+        history.billing_dtm = localDate;
 
         this.sendHistory(history);
     }

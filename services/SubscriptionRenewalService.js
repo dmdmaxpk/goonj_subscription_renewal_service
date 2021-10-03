@@ -33,15 +33,18 @@ subscriptionRenewal = async(packages) => {
                         packageObj = singlePackage;
                     }
                 });
-
-                let new_amount_billed_today_will_be = (subscriptions[i].amount_billed_today + packageObj.price_point_pkr)
-                if((subscriptions[i].subscribed_package_id === 'QDfC' && new_amount_billed_today_will_be > config.max_amount_billed_today_for_daily) || (subscriptions[i].subscribed_package_id === 'QDfG' && new_amount_billed_today_will_be > config.max_amount_billed_today_for_weekly)){
-                    // initiate excessive billing email and do the necessary actions
-
-                    let user_id = subscriptions[i].user_id;
-                    logExcessiveBilling(packageObj, user_id, subscriptions[i]);
+                if(packageObj){
+                    let new_amount_billed_today_will_be = (subscriptions[i].amount_billed_today + packageObj.price_point_pkr)
+                    if((subscriptions[i].subscribed_package_id === 'QDfC' && new_amount_billed_today_will_be > config.max_amount_billed_today_for_daily) || (subscriptions[i].subscribed_package_id === 'QDfG' && new_amount_billed_today_will_be > config.max_amount_billed_today_for_weekly)){
+                        // initiate excessive billing email and do the necessary actions
+    
+                        let user_id = subscriptions[i].user_id;
+                        logExcessiveBilling(packageObj, user_id, subscriptions[i]);
+                    }else{
+                        subscriptionToRenew = [...subscriptionToRenew, subscriptions[i]];
+                    }
                 }else{
-                    subscriptionToRenew = [...subscriptionToRenew, subscriptions[i]];
+                    console.log(`### No package object found for subscription ${subscriptions[i]._id}`);
                 }
             }
         }

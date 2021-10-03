@@ -198,9 +198,9 @@ class SubscriptionRepository {
     async getSubscriptionsToMark()  {
         let now = moment();
         let endOfDay = now.endOf('day').tz("Asia/Karachi");
-        endOfDay.hour(23)
-        endOfDay.minutes(59);
-        endOfDay.seconds(59);
+        //endOfDay.hour(23)
+        //endOfDay.minutes(59);
+        //endOfDay.seconds(59);
 
         let results = await Subscription.find(
             {$or:[{subscription_status:'billed'},
@@ -218,9 +218,9 @@ class SubscriptionRepository {
     async getSubscriptionsToMarkWithLimitAndOffset(limit, lastId, operator)  {
         let now = moment();
         let endOfDay = now.endOf('day').tz("Asia/Karachi");
-        endOfDay.hour(23)
-        endOfDay.minutes(59);
-        endOfDay.seconds(59);
+        //endOfDay.hour(23)
+        //endOfDay.minutes(59);
+        //endOfDay.seconds(59);
     
         let whereClause = "";
 
@@ -261,9 +261,9 @@ class SubscriptionRepository {
     async getCountOfSubscriptionToMark(operator){
         let now = moment();
         let endOfDay = now.endOf('day').tz("Asia/Karachi");
-        endOfDay.hour(23)
-        endOfDay.minutes(59);
-        endOfDay.seconds(59);
+        //endOfDay.hour(23)
+        //endOfDay.minutes(59);
+        //endOfDay.seconds(59);
 
         console.log('End of Day', endOfDay, operator);
 

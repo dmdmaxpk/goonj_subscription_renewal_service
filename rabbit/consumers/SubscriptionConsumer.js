@@ -78,6 +78,7 @@ class SubscriptionConsumer {
                 let subscriptionObj = {};
                 subscriptionObj.queued = false;
                 subscriptionObj.is_billable_in_this_cycle = false;
+                subscriptionObj.consecutive_successive_bill_counts = 0;
 
                 if((subscription.subscription_status === 'billed' || subscription.subscription_status === 'trial') && subscription.auto_renewal === true){
                     // The subscriber is eligible for grace hours, depends on the current subscribed package

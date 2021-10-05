@@ -100,7 +100,7 @@ class SubscriptionConsumer {
                     let nowDate = moment();
                     let timeInGrace = moment.duration(nowDate.diff(subscription.date_on_which_user_entered_grace_period));
                     let hoursSpentInGracePeriod = helper.float2Int(timeInGrace.asHours());
-                    console.log(`${subscription._id} spent ${hoursSpentInGracePeriod} hours in grace period`);
+                    //console.log(`${subscription._id} spent ${hoursSpentInGracePeriod} hours in grace period`);
             
                     if (hoursSpentInGracePeriod > mPackage.grace_hours){
                         historyStatus = 'expired';

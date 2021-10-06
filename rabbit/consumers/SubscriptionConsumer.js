@@ -268,7 +268,6 @@ class SubscriptionConsumer {
         history.billing_dtm = localDate;
 
         var objectId = new ObjectID();
-        console.log("mongo object id", objectId);
         history._id = objectId;
 
         this.sendHistory(history);

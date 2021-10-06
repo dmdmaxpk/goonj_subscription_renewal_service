@@ -239,7 +239,7 @@ class SubscriptionConsumer {
         percentage = (100 - percentage);
     
         //Send acknowldement to user
-        let message = "You've got "+percentage+"% discount on "+packageName+".  Numainday se baat k liye 727200 milayein.";
+        let message = "You've got "+parseInt(percentage)+"% discount on "+packageName+" on Goonj.";
         this.sendMessage(msisdn, message);
     }
 

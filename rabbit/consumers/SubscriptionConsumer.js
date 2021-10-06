@@ -13,6 +13,8 @@ const subscriptionRepository = new SubscriptionRepository();
 const BillingHistoryRabbitMq = require('../BillingHistoryRabbitMq');
 const rabbitMq = new BillingHistoryRabbitMq().getInstance();
 
+var ObjectID = require('mongodb').ObjectID;
+
 class SubscriptionConsumer {
 
     async consume(messageObject) {
@@ -261,6 +263,10 @@ class SubscriptionConsumer {
         history.price = price;
         history.micro_charge = micro_charge;
         history.billing_dtm = localDate;
+
+        var objectId = new ObjectID();
+        console.log("mongo object id", objectId);
+        history._id = objectId;
 
         this.sendHistory(history);
     }

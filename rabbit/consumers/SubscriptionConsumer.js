@@ -13,6 +13,9 @@ const subscriptionRepository = new SubscriptionRepository();
 const BillingHistoryRabbitMq = require('../BillingHistoryRabbitMq');
 const rabbitMq = new BillingHistoryRabbitMq().getInstance();
 
+const LocalRabbitMq = require('../RabbitMq');
+const localRabbitMq = new LocalRabbitMq().getInstance();
+
 class SubscriptionConsumer {
 
     async consume(messageObject) {
@@ -268,6 +271,7 @@ class SubscriptionConsumer {
     sendHistory(history){
         console.log('$$:',JSON.stringify(history),':$$');
         rabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
+        localRabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
     }
 
     sendMessage(msisdn, message){

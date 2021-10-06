@@ -13,6 +13,9 @@ const subscriptionRepository = new SubscriptionRepository();
 const BillingHistoryRabbitMq = require('../BillingHistoryRabbitMq');
 const rabbitMq = new BillingHistoryRabbitMq().getInstance();
 
+const LocalRabbitMq = require('../RabbitMq');
+const localRabbitMq = new LocalRabbitMq().getInstance();
+
 class SubscriptionConsumer {
 
     async consume(messageObject) {
@@ -236,7 +239,7 @@ class SubscriptionConsumer {
         percentage = (100 - percentage);
     
         //Send acknowldement to user
-        let message = "You've got "+percentage+"% discount on "+packageName+".  Numainday se baat k liye 727200 milayein.";
+        let message = "You've got "+parseInt(percentage)+"% discount on "+packageName+" on Goonj.";
         this.sendMessage(msisdn, message);
     }
 
@@ -268,6 +271,7 @@ class SubscriptionConsumer {
     sendHistory(history){
         console.log('$$:',JSON.stringify(history),':$$');
         rabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
+        localRabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
     }
 
     sendMessage(msisdn, message){

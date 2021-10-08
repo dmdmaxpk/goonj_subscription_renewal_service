@@ -113,7 +113,11 @@ class SubscriptionRepository {
         const query = { _id: subscription_id };
         postData.last_modified = new Date();
         try {
+            console.log('updateSubscription - query: ', query);
+            console.log('updateSubscription - postData: ', postData);
             let updated = await Subscription.findOneAndUpdate(query, postData, {new: true, useFindAndModify: false});
+            console.log('updateSubscription - updated: ', updated);
+
             return updated;
         } catch(error) {
             console.log(error);

@@ -127,57 +127,63 @@ expire = async(subscription) => {
 }
 
 renewSubscription = async(subscription, packages) => {
-    let messageObj = {};
-    subscription.subscribed_package_id = subscription.subscribed_package_id ? subscription.subscribed_package_id : 'QDfC'
 
-    let subscribedPackage = undefined;
+    if(subscription.user_id){
+        let messageObj = {};
+        subscription.subscribed_package_id = subscription.subscribed_package_id ? subscription.subscribed_package_id : 'QDfC'
 
-    subscribedPackage = packages.filter((package) => {
-        return package._id === subscription.subscribed_package_id
-    })[0];
+        let subscribedPackage = undefined;
 
-    if(subscription.try_micro_charge_in_next_cycle === true && subscription.micro_price_point > 0){
-        if(subscription.payment_source === 'easypaisa'){
-            messageObj.transaction_id = `epmicro_${nanoid(10)}`;
+        subscribedPackage = packages.filter((package) => {
+            return package._id === subscription.subscribed_package_id
+        })[0];
+
+        if(subscription.try_micro_charge_in_next_cycle === true && subscription.micro_price_point > 0){
+            if(subscription.payment_source === 'easypaisa'){
+                messageObj.transaction_id = `epmicro_${nanoid(10)}`;
+            }else{
+                messageObj.transaction_id = `tpmicro_${subscription._id}_${nanoid(10)}`;
+            }
+            messageObj.micro_charge = true;
+            messageObj.amount = subscription.micro_price_point;
         }else{
-            messageObj.transaction_id = `tpmicro_${subscription._id}_${nanoid(10)}`;
+            if(subscription.payment_source === 'easypaisa'){
+                messageObj.transaction_id = `epfull_${nanoid(10)}`;
+            }else{
+                messageObj.transaction_id = `tpfull_${subscription._id}_${nanoid(10)}`;
+            }
+
+            messageObj.micro_charge = false;
+            messageObj.amount = subscribedPackage.price_point_pkr
         }
-        messageObj.micro_charge = true;
-        messageObj.amount = subscription.micro_price_point;
-    }else{
-        if(subscription.payment_source === 'easypaisa'){
-            messageObj.transaction_id = `epfull_${nanoid(10)}`;
-        }else{
-            messageObj.transaction_id = `tpfull_${subscription._id}_${nanoid(10)}`;
-        }
-
-        messageObj.micro_charge = false;
-        messageObj.amount = subscribedPackage.price_point_pkr
-    }
-
-    // Add object in queueing server
-    let user = await axios({method: 'get', url: config.servicesUrls.user_service + subscription.user_id, headers: {'Content-Type': 'application/json' }
-    }).then(function(response){
-        return response.data;
-    }).catch(function(err){
-        console.log(err);
-        return undefined;
-    });
-
-    if(user && user._id && subscription.queued === false && subscription.active){
-        messageObj.package = subscribedPackage
-        messageObj.user = user;
-        messageObj.subscription_id = subscription._id;
-        messageObj.payment_source = subscription.payment_source;
-        messageObj.ep_token = subscription.ep_token;
-
-        rabbitMq.addInQueue(config.queueNames.subscriptionDispatcher, messageObj);
-        await subscriptionRepo.updateSubscription(subscription._id, {queued: true});
-        count += 1;
         
-        console.log(subscription._id, ' added in queue');
+
+        // Add object in queueing server
+        let user = await axios({method: 'get', url: config.servicesUrls.user_service + subscription.user_id, headers: {'Content-Type': 'application/json' }
+        }).then(function(response){
+            return response.data;
+        }).catch(function(err){
+            console.log(err);
+            return undefined;
+        });
+
+        if(user && user._id && subscription.queued === false && subscription.active){
+            messageObj.package = subscribedPackage
+            messageObj.user = user;
+            messageObj.subscription_id = subscription._id;
+            messageObj.payment_source = subscription.payment_source;
+            messageObj.ep_token = subscription.ep_token;
+
+            rabbitMq.addInQueue(config.queueNames.subscriptionDispatcher, messageObj);
+            await subscriptionRepo.updateSubscription(subscription._id, {queued: true});
+            count += 1;
+            
+            console.log(subscription._id, ' added in queue');
+        }else{
+            console.log(`Either user ${subscription.user_id} does not exist or the subscription ${subscription._id} is not active or the subscription ${subscription._id} is already queued`);
+        }
     }else{
-        console.log(`Either user ${subscription.user_id} does not exist or the subscription ${subscription._id} is not active or the subscription ${subscription._id} is already queued`);
+        console.log(`USER ID AGAINST THIS SUBSCRIPTION ${subscription._id} DOES NOT EXIST.`)
     }
 }
 

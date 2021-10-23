@@ -164,7 +164,7 @@ renewSubscription = async(subscription, packages) => {
         return undefined;
     });
 
-    if(user && subscription.queued === false && subscription.active){
+    if(user && user._id && subscription.queued === false && subscription.active){
         messageObj.package = subscribedPackage
         messageObj.user = user;
         messageObj.subscription_id = subscription._id;

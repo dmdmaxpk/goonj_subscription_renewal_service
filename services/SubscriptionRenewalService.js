@@ -159,10 +159,9 @@ renewSubscription = async(subscription, packages) => {
         
 
         // Add object in queueing server
-        let user = await axios({method: 'get', url: config.servicesUrls.user_service + subscription.user_id, headers: {'Content-Type': 'application/json' }
-        }).then(function(response){
+        let user = await axios.get(config.servicesUrls.user_service + subscription.user_id).then(response => {
             return response.data;
-        }).catch(function(err){
+        }).catch(err =>{
             console.log(err);
             return undefined;
         });

@@ -9,6 +9,7 @@ const moment = require("moment-timezone");
 
 // Import database models
 require('./models/Subscription');
+require('./models/User');
 
 const helper = require('./helper/helper');
 

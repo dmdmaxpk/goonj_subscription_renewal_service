@@ -12,6 +12,9 @@ const rabbitMq = new RabbitMq().getInstance();
 const BillingHistoryRabbitMq = require('../rabbit/BillingHistoryRabbitMq');
 const billingHistoryRabbitMq = new BillingHistoryRabbitMq().getInstance();
 
+const mongoose = require('mongoose');
+const User = mongoose.model('User');
+
 let count = 0;
 
 subscriptionRenewal = async(packages) => {
@@ -159,12 +162,7 @@ renewSubscription = async(subscription, packages) => {
         
 
         // Add object in queueing server
-        let user = await axios.get(config.servicesUrls.user_service + subscription.user_id).then(response => {
-            return response.data;
-        }).catch(err =>{
-            console.log(err);
-            return undefined;
-        });
+        let user = await User.findOne({_id: subscription.user_id});
 
         if(user && user._id && subscription.queued === false && subscription.active){
             messageObj.package = subscribedPackage

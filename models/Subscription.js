@@ -67,32 +67,36 @@ const subscriptionSchema = new Schema({
 }, { strict: true });
 subscriptionSchema.index({user_id:1,paywall_id:1},{unique: true});
 
-const SubscriptionEvents = MongooseTrigger(subscriptionSchema, {
-    events: {
-      create: true,
-      update: true,
-      remove: true,
-    },
-    debug: false
-});
-
-SubscriptionEvents.on('create', data => {
-    triggerEvent('create', data);
-});
-
-SubscriptionEvents.on('update', data => {
-  triggerEvent('update', data);
-});
-
-SubscriptionEvents.on('remove', data => {
-    triggerEvent('remove', data);
-});
-
-triggerEvent = async (method, data) => {
-    let form = {collection: 'subscriptions', method, data};
-
-    rabbitMq.addInQueue(config.queueNames.syncCollectionDispatcher, form);
-    //console.log('Sync data sent to queue', form.collection);
+if(config.is_triggeres_enabled){
+    const SubscriptionEvents = MongooseTrigger(subscriptionSchema, {
+        events: {
+          create: true,
+          update: true,
+          remove: true,
+        },
+        debug: false
+    });
+    
+    SubscriptionEvents.on('create', data => {
+        triggerEvent('create', data);
+    });
+    
+    SubscriptionEvents.on('update', data => {
+      triggerEvent('update', data);
+    });
+    
+    SubscriptionEvents.on('remove', data => {
+        triggerEvent('remove', data);
+    });
+    
+    triggerEvent = async (method, data) => {
+        let form = {collection: 'subscriptions', method, data};
+    
+        rabbitMq.addInQueue(config.queueNames.syncCollectionDispatcher, form);
+        //console.log('Sync data sent to queue', form.collection);
+    }    
+}else{
+    console.log("TRIGGERES ARE DISABLED");
 }
 
 module.exports = mongoose.model('Subscription', subscriptionSchema);

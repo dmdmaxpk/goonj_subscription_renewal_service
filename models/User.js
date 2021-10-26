@@ -46,32 +46,37 @@ const userSchema = new Schema({
     last_modified: Date
 }, { strict: true });
 
-const UserEvents = MongooseTrigger(userSchema, {
-    events: {
-      create: true,
-      update: true,
-      remove: true,
-    },
-    debug: false
-});
 
-UserEvents.on('create', data => {
-    triggerEvent('create', data);
-});
-
-UserEvents.on('update', data => {
-  triggerEvent('update', data);
-});
-
-UserEvents.on('remove', data => {
-    triggerEvent('remove', data);
-});
-
-triggerEvent = (method, data) => {
-    let form = {collection: 'users', method, data};
-
-    rabbitMq.addInQueue(config.queueNames.syncCollectionDispatcher, form);
-    console.log('Sync data sent to queue', form.collection);
+if(config.is_triggeres_enabled){
+    const UserEvents = MongooseTrigger(userSchema, {
+        events: {
+          create: true,
+          update: true,
+          remove: true,
+        },
+        debug: false
+    });
+    
+    UserEvents.on('create', data => {
+        triggerEvent('create', data);
+    });
+    
+    UserEvents.on('update', data => {
+      triggerEvent('update', data);
+    });
+    
+    UserEvents.on('remove', data => {
+        triggerEvent('remove', data);
+    });
+    
+    triggerEvent = (method, data) => {
+        let form = {collection: 'users', method, data};
+    
+        rabbitMq.addInQueue(config.queueNames.syncCollectionDispatcher, form);
+        console.log('Sync data sent to queue', form.collection);
+    }
+}else{
+    console.log("TRIGGERES ARE DISABLED");
 }
 
 module.exports = mongoose.model('User', userSchema);

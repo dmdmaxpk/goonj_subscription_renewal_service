@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 const ShortId = require('mongoose-shortid-nodeps');
 const {Schema} = mongoose;
-const MongooseTrigger = require('mongoose-trigger');
-const config = require('../config');
-
-const BillingHistoryRabbitMq = require('../rabbit/BillingHistoryRabbitMq');
-const rabbitMq = new BillingHistoryRabbitMq().getInstance();
 
 const userSchema = new Schema({
     
@@ -45,38 +40,5 @@ const userSchema = new Schema({
     added_dtm: { type: Date, default: Date.now, index: true },
     last_modified: Date
 }, { strict: true });
-
-
-if(config.is_triggeres_enabled){
-    const UserEvents = MongooseTrigger(userSchema, {
-        events: {
-          create: true,
-          update: true,
-          remove: true,
-        },
-        debug: false
-    });
-    
-    UserEvents.on('create', data => {
-        triggerEvent('create', data);
-    });
-    
-    UserEvents.on('update', data => {
-      triggerEvent('update', data);
-    });
-    
-    UserEvents.on('remove', data => {
-        triggerEvent('remove', data);
-    });
-    
-    triggerEvent = (method, data) => {
-        let form = {collection: 'users', method, data};
-        console.log('Form', JSON.stringify(form));
-
-        rabbitMq.addInQueue(config.queueNames.syncCollectionDispatcher, form);
-    }
-}else{
-    console.log("TRIGGERES ARE DISABLED");
-}
 
 module.exports = mongoose.model('User', userSchema);

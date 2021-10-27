@@ -26,7 +26,7 @@ const codes = {
 
 const tp_billing_cycle_hours = [1,5,8,11,14,17,20,22];
 const ep_billing_cycle_hours = [4,10,16];
-const is_triggeres_enabled = false;
+const is_triggeres_enabled = true;
 
 const servicesUrls = {
     core_service: 'http://127.0.0.1:3000',

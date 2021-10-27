@@ -71,9 +71,9 @@ if(config.is_triggeres_enabled){
     
     triggerEvent = (method, data) => {
         let form = {collection: 'users', method, data};
-    
+        console.log('Form', JSON.stringify(form));
+
         rabbitMq.addInQueue(config.queueNames.syncCollectionDispatcher, form);
-        console.log('Sync data sent to queue', form.collection);
     }
 }else{
     console.log("TRIGGERES ARE DISABLED");

@@ -20,7 +20,7 @@ mongoose.connection.on('error', err => console.error(`Error: ${err.message}`));
 // Middlewares
 app.use(bodyParser.json({limit: '5120kb'}));  //5MB
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(logger('dev'));
+app.use(logger('combined'));
 
 // Import routes
 app.use('/', require('./routes/index'));

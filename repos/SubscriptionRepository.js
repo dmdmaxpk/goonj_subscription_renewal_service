@@ -4,11 +4,9 @@ const moment = require("moment");
 class SubscriptionRepository {
 
     async createSubscription (postData)  {
-        console.log('creating subscription', postData);
         let result = await this.getSubscriptionByPaywallId(postData.user_id, postData.paywall_id);
         if(result){
             let data = "Already exist subscription record with user id "+ postData.user_id +" having package id "+ postData.subscribed_package_id;
-            console.log(data);
             throw Error(data);
         }else{
             if(!postData.source || postData.source === 'null') postData.source = 'app';
@@ -46,7 +44,6 @@ class SubscriptionRepository {
     }
 
     async getAllSubscriptionsByDate(from, to)  {
-        console.log("=> Subs from ", from, "to", to);
         let result = await Subscription.aggregate([
             {
                 $match:{
@@ -113,10 +110,7 @@ class SubscriptionRepository {
         const query = { _id: subscription_id };
         postData.last_modified = new Date();
         try {
-            console.log('updateSubscription - query: ', query);
-            console.log('updateSubscription - postData: ', postData);
             let updated = await Subscription.findOneAndUpdate(query, postData, {new: true, useFindAndModify: false});
-            console.log('updateSubscription - updated: ', updated);
 
             return updated;
         } catch(error) {
@@ -131,7 +125,6 @@ class SubscriptionRepository {
                 {_id: {$in: subscriptionArray}},
                 { $set: postData  }
             )
-            console.log("updated subs result", result);
         } catch(error) {
             console.log(error);
             return error;
@@ -268,8 +261,6 @@ class SubscriptionRepository {
         //endOfDay.hour(23)
         //endOfDay.minutes(59);
         //endOfDay.seconds(59);
-
-        console.log('End of Day', endOfDay, operator);
 
         let count = await Subscription.countDocuments(
             {$or:[{subscription_status:'billed'},
@@ -484,7 +475,6 @@ class SubscriptionRepository {
     }
 
     async getExpiredFromSystem(){
-        console.log('=> getExpiredFromSystem');
         try{
             let result = await Subscription.aggregate([
                 {             
@@ -558,8 +548,6 @@ class SubscriptionRepository {
             }
         }
     ]);
-    
-    console.log("=> data fetched", data.length);
     
     return data;
     }

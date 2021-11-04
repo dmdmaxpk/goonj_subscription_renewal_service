@@ -40,7 +40,6 @@ let { port } = config;
 var CronJob = require('cron').CronJob;
 var billingJob = new CronJob('*/3 * * * *', function() {
     axios.get(`http://localhost:${port}/cron/renewSubscriptions`).then(res => {
-        console.log(res.data);
     }).catch(err =>{
         console.log('error while running billing cron:', err);
     });
@@ -51,7 +50,6 @@ billingJob.start();
 var markRenewalsJob = new CronJob('0 * * * *', function() {
     try{
         axios.get(`http://localhost:${port}/cron/markRenewableUsers`).then(res => {
-            console.log(res.data);
         }).catch(err =>{
             helper.billingCycleFailedToExecute();
             console.log('error while running mark renewal cron:', err);
@@ -67,8 +65,6 @@ let endOfDay = now.endOf('day').tz("Asia/Karachi");
 endOfDay.hour(23)
 endOfDay.minutes(59);
 endOfDay.seconds(59);
-console.log('End of Day', endOfDay);
-
 
 // Start Server
 app.listen(port, () => {

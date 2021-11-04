@@ -21,7 +21,6 @@ subscriptionRenewal = async(packages) => {
     try {
         ackCronitor('renew-subscriptions', 'run');
         let subscriptions = await subscriptionRepo.getRenewableSubscriptions();
-        console.log('Subscription fetched from database to bill', subscriptions.length);
 
         let subscriptionToRenew = [];
         let subscriptionNotToRenew = [];
@@ -174,8 +173,6 @@ renewSubscription = async(subscription, packages) => {
             rabbitMq.addInQueue(config.queueNames.subscriptionDispatcher, messageObj);
             await subscriptionRepo.updateSubscription(subscription._id, {queued: true});
             count += 1;
-            
-            console.log(subscription._id, ' added in queue');
         }else{
             console.log(`Either user ${subscription.user_id} does not exist or the subscription ${subscription._id} is not active or the subscription ${subscription._id} is already queued`);
         }
@@ -190,10 +187,8 @@ markRenewableUser = async() => {
         let now = moment().tz("Asia/Karachi");
         let hour = now.hours();
         if (config.tp_billing_cycle_hours.includes(hour)) {
-            console.log(`Billing cycle for telenor at ${hour} O'Clock`);
             mark('telenor');
         }else if(config.ep_billing_cycle_hours.includes(hour)){
-            console.log(`Billing cycle for easypaisa at ${hour} O'Clock`);
             mark('easypaisa');
         } else {
             console.log(`No billing cycle for telenor/easypaisa at ${hour} O'Clock`);
@@ -220,7 +215,6 @@ mark = async(operator) => {
         try{
             let response = await getMarkUsersPromise(chunkSize, lastId, operator);
             lastId = response;
-            console.log("Chunk ",i,' - ', response);
         }catch(e){
             console.log("Chunk ",i,' error - ', e);
         }
@@ -251,11 +245,9 @@ markRenewableUserForcefully = async() => {
 }
 
 validateResults = async() => {
-    console.log("Validating...");
 
     let countThreshold = 350000;
     let totalCount = await subscriptionRepo.getBillableInCycleCount();
-    console.log("Total billable in cycle count is " + totalCount);
 
     if(totalCount < countThreshold){
         axios.post(`${config.servicesUrls.message_service}/message/email`, {
@@ -263,7 +255,7 @@ validateResults = async() => {
             text: `Total billable cycle count is ${totalCount}, which is lower than threshold ${countThreshold}. Please check asap!`,
             to: ['paywall@dmdmax.com.pk', 'usama.shamim@dmdmax.com', 'taha@dmdmax.com', 'nauman@dmdmax.com', 'muhammad.azam@dmdmax.com']
         }).then(res => {
-            console.log('email sent with response: ', res.data);
+            // console.log('email sent with response: ', res.data);
         }).catch(err => {
             console.log('email service throws error:', err)
         });

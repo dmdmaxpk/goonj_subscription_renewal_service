@@ -30,7 +30,6 @@ exports.renewSubscriptions = async (req, res) =>  {
         renewalService.subscriptionRenewal(packages);
         res.send({status: config.codes.code_success, message: 'RenewSubscriptions Executed'});
     }else{
-        console.log('Packages not available');
         res.send({status: config.codes.code_error, message: 'Packages not available'});
     }
 }

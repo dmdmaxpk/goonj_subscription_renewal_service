@@ -68,11 +68,9 @@ class SubscriptionConsumer {
                 await subscriptionRepository.updateSubscription(subscription._id, subscriptionObj);
             
                 if(micro_charge === true && amount > 0){
-                    console.log('micro charge success');
                     this.sendMicroChargeMessage(user.msisdn, mPackage.display_price_point, amount, mPackage.package_name)
                     this.assembleAndSendBillingHistory(user, subscription, mPackage, api_response.full_api_response, api_response.message, response_time, transaction_id, true, amount);
                 }else{
-                    console.log('full charge success');
                     this.sendRenewalMessage(subscription, user.msisdn, mPackage._id, user._id)
                     this.assembleAndSendBillingHistory(user, subscription, mPackage, api_response.full_api_response, api_response.message, response_time, transaction_id, false, amount);
                 }
@@ -125,12 +123,10 @@ class SubscriptionConsumer {
                         let message = 'You package to Goonj TV has expired, click below link to subscribe again.\n'+link;
                         this.sendMessage(user.msisdn, message);
                     }else if(mPackage.is_micro_charge_allowed === true && hoursSpentInGracePeriod > 8 && hoursSpentInGracePeriod <= 24){
-                        console.log("Micro charging activated for: ",subscription._id);
                         subscriptionObj.subscription_status = 'graced';
                         historyStatus = "graced";
         
                         subscriptionObj = this.activateMicroCharging(subscription, mPackage, subscriptionObj);
-                        console.log("Micro Charging Activated Subscription Object Returned:",subscriptionObj);
                     }else{
                         let nextBillingDate = new Date();
                         nextBillingDate.setHours(nextBillingDate.getHours() + config.time_between_billing_attempts_hours);
@@ -150,7 +146,6 @@ class SubscriptionConsumer {
                         } else {
                             hours = hoursSpentInGracePeriod;
                         }
-                        console.log("Hours since last payment", hours);
                         
                         if(hours > 24){
                             subscriptionObj.is_allowed_to_stream = false;
@@ -179,7 +174,6 @@ class SubscriptionConsumer {
             }
             return 'Done';
         }else{
-            console.log('Return object not found!');
             return 'Error';
         }
     }
@@ -236,7 +230,6 @@ class SubscriptionConsumer {
     }
     
     sendMicroChargeMessage (msisdn, fullPrice, price, packageName)  {
-        console.log("Sending %age discount message to "+msisdn);
         let percentage = ((price / fullPrice)*100);
         percentage = (100 - percentage);
     
@@ -282,7 +275,7 @@ class SubscriptionConsumer {
     sendMessage(msisdn, message){
         axios.post(`${config.servicesUrls.message_service}/message/send-to-queue`, {message, msisdn})
         .then(res =>{ 
-            console.log(res.data);
+            // console.log(res.data);
         }).catch(err =>{
             console.log(err);
         })

@@ -91,7 +91,6 @@ if(config.is_triggeres_enabled){
     
     triggerEvent = async (method, data) => {
         let form = {collection: 'subscriptions', method, data};
-        console.log('Form', JSON.stringify(form));
 
         rabbitMq.addInQueue(config.queueNames.syncCollectionDispatcher, form);
     }    

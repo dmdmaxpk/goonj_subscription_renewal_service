@@ -1,5 +1,5 @@
 {
-  "name": "goonj_subscription_service",
+  "name": "goonj_subscription_renewal_service",
   "version": "1.0.0",
   "description": "billing renewal service",
   "main": "app.js",

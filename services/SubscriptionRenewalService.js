@@ -54,10 +54,10 @@ subscriptionRenewal = async(packages) => {
         console.warn('Subscription to expire', subscriptionNotToRenew.length);
         console.warn('Subscription to renew', subscriptionToRenew.length);
 
-        for(let i = 0; i < subscriptionNotToRenew.length; i++) {
-            let subs = subscriptionNotToRenew[i];
-            await expire(subs);
-        }
+        // for(let i = 0; i < subscriptionNotToRenew.length; i++) {
+        //     let subs = subscriptionNotToRenew[i];
+        //     await expire(subs);
+        // }
 
         for(let i = 0; i < subscriptionToRenew.length; i++){
             renewSubscription(subscriptionToRenew[i], packages);

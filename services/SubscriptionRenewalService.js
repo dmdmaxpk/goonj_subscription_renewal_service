@@ -110,15 +110,15 @@ expire = async(subscription) => {
         queued: false
     });
 
-    let packageObj = await packageRepo.getPackage({_id: subscription.subscribed_package_id});
-    let user = await userRepo.getUserBySubscriptionId(subscription._id);
+    //let packageObj = await packageRepo.getPackage({_id: subscription.subscribed_package_id});
+    //let user = await userRepo.getUserBySubscriptionId(subscription._id);
 
     let history = {};
-    history.user_id = user._id;
+    history.user_id = subscription.user_id;
     history.subscriber_id = subscription.subscriber_id;
     history.subscription_id = subscription._id;
     history.package_id = subscription.subscribed_package_id;
-    history.paywall_id = packageObj.paywall_id;
+    history.paywall_id = subscription.paywall_id;
     history.transaction_id = undefined;
     history.operator_response = undefined;
     history.billing_status = 'expired';

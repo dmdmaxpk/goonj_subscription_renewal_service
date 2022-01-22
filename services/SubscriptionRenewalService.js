@@ -54,10 +54,10 @@ subscriptionRenewal = async(packages) => {
         console.warn('Subscription to expire', subscriptionNotToRenew.length);
         console.warn('Subscription to renew', subscriptionToRenew.length);
 
-        // for(let i = 0; i < subscriptionNotToRenew.length; i++) {
-        //     let subs = subscriptionNotToRenew[i];
-        //     await expire(subs);
-        // }
+        for(let i = 0; i < subscriptionNotToRenew.length; i++) {
+            let subs = subscriptionNotToRenew[i];
+            await expire(subs);
+        }
 
         for(let i = 0; i < subscriptionToRenew.length; i++){
             renewSubscription(subscriptionToRenew[i], packages);
@@ -125,7 +125,9 @@ expire = async(subscription) => {
     history.source = 'system';
     history.operator = subscription.payment_source;
 
-    await billingHistoryRepo.createBillingHistory(history);
+    console.log('$$:',JSON.stringify(history),':$$');
+    rabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
+    billingHistoryRabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
 }
 
 renewSubscription = async(subscription, packages) => {

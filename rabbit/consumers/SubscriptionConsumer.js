@@ -64,6 +64,17 @@ class SubscriptionConsumer {
                 // fields for micro charging
                 subscriptionObj.try_micro_charge_in_next_cycle = false;
                 subscriptionObj.micro_price_point = 0;
+
+                // send WALEE subscription success callback if last subscription status was 'trial'.
+                if(subscription.subscription_status === 'trial' && subscription.affiliate_mid === 'walee'){
+                    const body = {
+                        utm_source: subscription.source,
+                        subscription_id: subscription._id,
+                        userPhone: user.msisdn,
+                        totalPrice: amount
+                    }
+                    this.waleeSuccessSubscription(body);
+                }
                 
                 await subscriptionRepository.updateSubscription(subscription._id, subscriptionObj);
             
@@ -278,6 +289,16 @@ class SubscriptionConsumer {
             // console.log(res.data);
         }).catch(err =>{
             console.log(err);
+        })
+    }
+    waleeSuccessSubscription(body){
+        axios.post(`${config.servicesUrls.subscription_service}/walee/subscription-success`, body)
+        .then(res => {
+            const result = res.data;
+            console.log('warning', 'WALEE SUCCESSFUL SUBSCRIPTION callback sent for MSISDN: ', body.userPhone);
+        })
+        .catch(err => {
+            console.log('WALEE SUBSCRIPTION CALLBACK err:', err);
         })
     }
 }

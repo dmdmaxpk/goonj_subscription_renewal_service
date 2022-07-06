@@ -32,6 +32,7 @@ const servicesUrls = {
     core_service: 'http://127.0.0.1:3000',
     user_service: 'http://127.0.0.1:3007/user/get_user_by_id?id=',
     message_service: 'http://127.0.0.1:3003',
+    subscription_service: 'http://127.0.0.1:3004',
     billing_history_service: 'http://10.0.1.88:3008'
 }
 

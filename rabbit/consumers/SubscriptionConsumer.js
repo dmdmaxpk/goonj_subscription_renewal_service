@@ -80,7 +80,7 @@ class SubscriptionConsumer {
                 // send WALEE subscription success callback if last subscription status was 'trial' and its less than 7 days.
                 if(subscription.affiliate_mid === 'walee' && subscription.subscription_status === 'trial' && diff < 168){
                     console.log('Walee - Triggered Subscription API within 168 hours')
-                    await this.waleeSuccessSubscription({
+                    this.waleeSuccessSubscription({
                         subscription_id: subscription._id,
                         utm_source: user.source,
                         userPhone: user.msisdn,
@@ -303,7 +303,8 @@ class SubscriptionConsumer {
             console.log(err);
         })
     }
-    async waleeSuccessSubscription(body) {
+    
+    waleeSuccessSubscription(body) {
         axios.post(`${config.servicesUrls.subscription_service}/walee/subscription-success`, body)
         .then(res => {
             const result = res.data;

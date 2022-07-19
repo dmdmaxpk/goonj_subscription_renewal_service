@@ -65,15 +65,27 @@ class SubscriptionConsumer {
                 subscriptionObj.try_micro_charge_in_next_cycle = false;
                 subscriptionObj.micro_price_point = 0;
 
-                // send WALEE subscription success callback if last subscription status was 'trial'.
-                if(subscription.subscription_status === 'trial' && subscription.affiliate_mid === 'walee'){
-                    const body = {
-                        utm_source: subscription.source,
+                // send walee subscription hook - only first time / difference of joining and charging is less than 7 days
+                // diff should be of 7 days which is 168 hours
+                
+                let today = moment().utc();
+                today.add(5, 'h');
+
+                let joiningDate = moment(subscription.added_dtm);
+                console.log('Walee - ', today, ' - ', joiningDate);
+
+                // diff should be of 7 days which is 168 hours.
+                let diff = joiningDate.diff(today, 'hours');
+
+                // send WALEE subscription success callback if last subscription status was 'trial' and its less than 7 days.
+                if(subscription.affiliate_mid === 'walee' && subscription.subscription_status === 'trial' && diff < 168){
+                    console.log('Walee - Triggered Subscription API within 168 hours')
+                    this.waleeSuccessSubscription({
                         subscription_id: subscription._id,
+                        utm_source: user.source,
                         userPhone: user.msisdn,
                         totalPrice: amount
-                    }
-                    this.waleeSuccessSubscription(body);
+                    });
                 }
                 
                 await subscriptionRepository.updateSubscription(subscription._id, subscriptionObj);
@@ -291,14 +303,15 @@ class SubscriptionConsumer {
             console.log(err);
         })
     }
-    waleeSuccessSubscription(body){
+    
+    waleeSuccessSubscription(body) {
         axios.post(`${config.servicesUrls.subscription_service}/walee/subscription-success`, body)
         .then(res => {
             const result = res.data;
-            console.log('warning', 'WALEE SUCCESSFUL SUBSCRIPTION callback sent for MSISDN: ', body.userPhone);
+            console.log('Walee - SUCCESSFUL SUBSCRIPTION callback sent for MSISDN: ', body.userPhone, result);
         })
         .catch(err => {
-            console.log('WALEE SUBSCRIPTION CALLBACK err:', err);
+            console.log('Walee - SUBSCRIPTION CALLBACK err:', err);
         })
     }
 }

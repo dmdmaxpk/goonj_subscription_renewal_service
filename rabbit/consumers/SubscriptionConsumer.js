@@ -303,7 +303,7 @@ class SubscriptionConsumer {
             console.log(err);
         })
     }
-    waleeSuccessSubscription = async(body) => {
+    async waleeSuccessSubscription(body) {
         axios.post(`${config.servicesUrls.subscription_service}/walee/subscription-success`, body)
         .then(res => {
             const result = res.data;

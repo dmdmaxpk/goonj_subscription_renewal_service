@@ -9,6 +9,7 @@ const moment = require("moment-timezone");
 
 // Import database models
 require('./models/Subscription');
+require('./models/User');
 
 const helper = require('./helper/helper');
 
@@ -19,7 +20,7 @@ mongoose.connection.on('error', err => console.error(`Error: ${err.message}`));
 // Middlewares
 app.use(bodyParser.json({limit: '5120kb'}));  //5MB
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(logger('dev'));
+app.use(logger('combined'));
 
 // Import routes
 app.use('/', require('./routes/index'));
@@ -39,7 +40,6 @@ let { port } = config;
 var CronJob = require('cron').CronJob;
 var billingJob = new CronJob('*/3 * * * *', function() {
     axios.get(`http://localhost:${port}/cron/renewSubscriptions`).then(res => {
-        console.log(res.data);
     }).catch(err =>{
         console.log('error while running billing cron:', err);
     });
@@ -50,7 +50,6 @@ billingJob.start();
 var markRenewalsJob = new CronJob('0 * * * *', function() {
     try{
         axios.get(`http://localhost:${port}/cron/markRenewableUsers`).then(res => {
-            console.log(res.data);
         }).catch(err =>{
             helper.billingCycleFailedToExecute();
             console.log('error while running mark renewal cron:', err);
@@ -66,8 +65,6 @@ let endOfDay = now.endOf('day').tz("Asia/Karachi");
 endOfDay.hour(23)
 endOfDay.minutes(59);
 endOfDay.seconds(59);
-console.log('End of Day', endOfDay);
-
 
 // Start Server
 app.listen(port, () => {

@@ -12,13 +12,15 @@ const rabbitMq = new RabbitMq().getInstance();
 const BillingHistoryRabbitMq = require('../rabbit/BillingHistoryRabbitMq');
 const billingHistoryRabbitMq = new BillingHistoryRabbitMq().getInstance();
 
+const mongoose = require('mongoose');
+const User = mongoose.model('User');
+
 let count = 0;
 
 subscriptionRenewal = async(packages) => {
     try {
         ackCronitor('renew-subscriptions', 'run');
         let subscriptions = await subscriptionRepo.getRenewableSubscriptions();
-        console.log('Subscription fetched from database to bill', subscriptions.length);
 
         let subscriptionToRenew = [];
         let subscriptionNotToRenew = [];
@@ -108,22 +110,24 @@ expire = async(subscription) => {
         queued: false
     });
 
-    let packageObj = await packageRepo.getPackage({_id: subscription.subscribed_package_id});
-    let user = await userRepo.getUserBySubscriptionId(subscription._id);
+    //let packageObj = await packageRepo.getPackage({_id: subscription.subscribed_package_id});
+    //let user = await userRepo.getUserBySubscriptionId(subscription._id);
 
     let history = {};
-    history.user_id = user._id;
+    history.user_id = subscription.user_id;
     history.subscriber_id = subscription.subscriber_id;
     history.subscription_id = subscription._id;
     history.package_id = subscription.subscribed_package_id;
-    history.paywall_id = packageObj.paywall_id;
+    history.paywall_id = subscription.paywall_id;
     history.transaction_id = undefined;
     history.operator_response = undefined;
     history.billing_status = 'expired';
     history.source = 'system';
     history.operator = subscription.payment_source;
 
-    await billingHistoryRepo.createBillingHistory(history);
+    console.log('$$:',JSON.stringify(history),':$$');
+    rabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
+    billingHistoryRabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
 }
 
 renewSubscription = async(subscription, packages) => {
@@ -159,12 +163,7 @@ renewSubscription = async(subscription, packages) => {
         
 
         // Add object in queueing server
-        let user = await axios.get(config.servicesUrls.user_service + subscription.user_id).then(response => {
-            return response.data;
-        }).catch(err =>{
-            console.log(err);
-            return undefined;
-        });
+        let user = await User.findOne({_id: subscription.user_id});
 
         if(user && user._id && subscription.queued === false && subscription.active){
             messageObj.package = subscribedPackage
@@ -176,8 +175,6 @@ renewSubscription = async(subscription, packages) => {
             rabbitMq.addInQueue(config.queueNames.subscriptionDispatcher, messageObj);
             await subscriptionRepo.updateSubscription(subscription._id, {queued: true});
             count += 1;
-            
-            console.log(subscription._id, ' added in queue');
         }else{
             console.log(`Either user ${subscription.user_id} does not exist or the subscription ${subscription._id} is not active or the subscription ${subscription._id} is already queued`);
         }
@@ -192,10 +189,8 @@ markRenewableUser = async() => {
         let now = moment().tz("Asia/Karachi");
         let hour = now.hours();
         if (config.tp_billing_cycle_hours.includes(hour)) {
-            console.log(`Billing cycle for telenor at ${hour} O'Clock`);
             mark('telenor');
         }else if(config.ep_billing_cycle_hours.includes(hour)){
-            console.log(`Billing cycle for easypaisa at ${hour} O'Clock`);
             mark('easypaisa');
         } else {
             console.log(`No billing cycle for telenor/easypaisa at ${hour} O'Clock`);
@@ -222,7 +217,6 @@ mark = async(operator) => {
         try{
             let response = await getMarkUsersPromise(chunkSize, lastId, operator);
             lastId = response;
-            console.log("Chunk ",i,' - ', response);
         }catch(e){
             console.log("Chunk ",i,' error - ', e);
         }
@@ -253,11 +247,9 @@ markRenewableUserForcefully = async() => {
 }
 
 validateResults = async() => {
-    console.log("Validating...");
 
     let countThreshold = 350000;
     let totalCount = await subscriptionRepo.getBillableInCycleCount();
-    console.log("Total billable in cycle count is " + totalCount);
 
     if(totalCount < countThreshold){
         axios.post(`${config.servicesUrls.message_service}/message/email`, {
@@ -265,7 +257,7 @@ validateResults = async() => {
             text: `Total billable cycle count is ${totalCount}, which is lower than threshold ${countThreshold}. Please check asap!`,
             to: ['paywall@dmdmax.com.pk', 'usama.shamim@dmdmax.com', 'taha@dmdmax.com', 'nauman@dmdmax.com', 'muhammad.azam@dmdmax.com']
         }).then(res => {
-            console.log('email sent with response: ', res.data);
+            // console.log('email sent with response: ', res.data);
         }).catch(err => {
             console.log('email service throws error:', err)
         });

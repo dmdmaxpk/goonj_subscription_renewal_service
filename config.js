@@ -26,12 +26,13 @@ const codes = {
 
 const tp_billing_cycle_hours = [1,5,8,11,14,17,20,22];
 const ep_billing_cycle_hours = [4,10,16];
-
+const is_triggeres_enabled = true;
 
 const servicesUrls = {
     core_service: 'http://127.0.0.1:3000',
     user_service: 'http://127.0.0.1:3007/user/get_user_by_id?id=',
     message_service: 'http://127.0.0.1:3003',
+    subscription_service: 'http://127.0.0.1:3004',
     billing_history_service: 'http://10.0.1.88:3008'
 }
 
@@ -72,7 +73,8 @@ let config = {
         max_amount_billed_today_for_weekly: max_amount_billed_today_for_weekly,
         ideationUrls: ideationUrls,
         time_between_billing_attempts_hours: time_between_billing_attempts_hours,
-        billingHistoryRabbitMqConnectionString: billingHistoryRabbitMqConnectionString
+        billingHistoryRabbitMqConnectionString: billingHistoryRabbitMqConnectionString,
+        is_triggeres_enabled: is_triggeres_enabled
     },
     staging: {
         port: 3005,
@@ -87,7 +89,8 @@ let config = {
         max_amount_billed_today_for_weekly: max_amount_billed_today_for_weekly,
         ideationUrls: ideationUrls,
         time_between_billing_attempts_hours: time_between_billing_attempts_hours,
-        billingHistoryRabbitMqConnectionString: billingHistoryRabbitMqConnectionString
+        billingHistoryRabbitMqConnectionString: billingHistoryRabbitMqConnectionString,
+        is_triggeres_enabled: is_triggeres_enabled
     },
     production: {
         port: 3005,
@@ -102,7 +105,8 @@ let config = {
         max_amount_billed_today_for_weekly: max_amount_billed_today_for_weekly,
         ideationUrls: ideationUrls,
         time_between_billing_attempts_hours: time_between_billing_attempts_hours,
-        billingHistoryRabbitMqConnectionString: billingHistoryRabbitMqConnectionString
+        billingHistoryRabbitMqConnectionString: billingHistoryRabbitMqConnectionString,
+        is_triggeres_enabled: is_triggeres_enabled
     }
 };
 

@@ -16,9 +16,7 @@ class Helper {
         let emails = ['farhan.ali@dmdmax.com', 'nauman@dmdmax.com', 'usama.shamim@dmdmax.com', 'taha@dmdmax.com', 'muhammad.azam@dmdmax.com'];
         let cellNumbers = ['03476733767', '03335456507', '03468586076', '03336106083', '03485049911', '03455932384', '03087650052', '03461524521', '03468567087', '03215517524'];
         cellNumbers.forEach(async(msisdn) => {
-            console.log('Sending message to', msisdn);
             this.sendMessage(msisdn).then(res => {
-                console.log(res);
             });
         });
 

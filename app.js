@@ -6,16 +6,16 @@ const config = require('./config');
 const axios = require('axios');
 const app = express();
 const moment = require("moment-timezone");
-
-// Import database models
-require('./models/Subscription');
-require('./models/User');
-
 const helper = require('./helper/helper');
 
 // Connection to Database
 mongoose.connect(config.mongo_connection_url, {useUnifiedTopology: true, useCreateIndex: true, useNewUrlParser: true, useFindAndModify: false});
 mongoose.connection.on('error', err => console.error(`Error: ${err.message}`));
+
+// Import database models
+require('./models/Subscription');
+require('./models/User');
+require('./models/Package');
 
 // Middlewares
 app.use(bodyParser.json({limit: '5120kb'}));  //5MB

@@ -26,7 +26,10 @@ exports.callback = async (req, res) =>  {
     let {msisdn, status, channel, gw_transaction_id} = req.body;
     if(msisdn, status, channel) {
         let user = await userRepo.getUserByMsisdn(`0${msisdn}`);
-        if(!user) res.status(404).send(`Provided msisdn '${msisdn}' is not found`); 
+        if(!user) {
+            res.status(404).send(`Provided msisdn '${msisdn}' is not found`);
+            return;
+        }
 
         let subscription = await subscriptionRepo.getSubscriptionBySubscriberId(user._id);
         let package = await packageRepo.getPackage({_id: subscription.subscribed_package_id});

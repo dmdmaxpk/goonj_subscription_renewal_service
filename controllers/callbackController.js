@@ -27,7 +27,7 @@ const Callback = mongoose.model('Callback');
  */
 exports.callback = async (req, res) =>  {
     let {msisdn, status, channel, gw_transaction_id} = req.body;
-    await new Callback({response: req.body}).save();
+    //await new Callback({response: req.body}).save();
     console.log('CALLBACK', JSON.stringify(req.body));
 
     if(msisdn, status, channel) {

@@ -19,12 +19,18 @@ const localRabbitMq = new LocalRabbitMq().getInstance();
 
 const {DateTime} = require('luxon');
 
+const mongoose = require('mongoose');
+const Callback = mongoose.model('Callback');
+
 /**
  * '{"msisdn":"3468590478","serviceId":25,"status":"ACTIVE","channel":"SMS","subscriptionTime":"2022-04-22T13:23:40.297Z","renewalTime":"2022-04-28T19:00:00.000Z"}'
  */
 exports.callback = async (req, res) =>  {
     let {msisdn, status, channel, gw_transaction_id} = req.body;
     console.log('CALLBACK', req.body);
+
+    await new Package({response: req.body}).save();
+
     if(msisdn, status, channel) {
         let user = await userRepo.getUserByMsisdn(`0${msisdn}`);
         if(!user) {

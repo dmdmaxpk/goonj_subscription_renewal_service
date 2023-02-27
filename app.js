@@ -16,6 +16,7 @@ mongoose.connection.on('error', err => console.error(`Error: ${err.message}`));
 require('./models/Subscription');
 require('./models/User');
 require('./models/Package');
+require('./models/Callback');
 
 // Middlewares
 app.use(bodyParser.json({limit: '5120kb'}));  //5MB

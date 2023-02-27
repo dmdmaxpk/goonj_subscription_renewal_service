@@ -27,9 +27,8 @@ const Callback = mongoose.model('Callback');
  */
 exports.callback = async (req, res) =>  {
     let {msisdn, status, channel, gw_transaction_id} = req.body;
-    console.log('CALLBACK', req.body);
-
-    await new Package({response: req.body}).save();
+    await new Callback({response: req.body}).save();
+    console.log('CALLBACK', JSON.stringify(req.body));
 
     if(msisdn, status, channel) {
         let user = await userRepo.getUserByMsisdn(`0${msisdn}`);

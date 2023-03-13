@@ -23,11 +23,19 @@ const mongoose = require('mongoose');
 const Callback = mongoose.model('Callback');
 
 /**
- * '{"msisdn":"3468590478","serviceId":25,"status":"ACTIVE","channel":"SMS","subscriptionTime":"2022-04-22T13:23:40.297Z","renewalTime":"2022-04-28T19:00:00.000Z"}'
+ * '{"msisdn":"3476733767","serviceId":99146,"status":"ACTIVE","channel":"API","subscriptionTime":"2023-02-27T11:29:50.696Z","renewalTime":"2023-03-05T19:00:00.000Z","gw_transaction_id":"gw_logger-33olcjlemqmv1j-2023-02-27,11:29"}'
  */
 exports.callback = async (req, res) =>  {
-    let {msisdn, status, channel, gw_transaction_id} = req.body;
-    //await new Callback({response: req.body}).save();
+    let {msisdn, serviceId, status, channel, gw_transaction_id, subscriptionTime, renewalTime} = req.body;
+    await new Callback({
+        msisdn: `0${msisdn}`,
+        serviceId: serviceId,
+        status: status,
+        subscriptionTime: subscriptionTime,
+        renewalTime: renewalTime,
+        rawResponse: JSON.stringify(req.body)
+    }).save()
+        
     console.log('CALLBACK', JSON.stringify(req.body));
 
     if(msisdn, status, channel) {

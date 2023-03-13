@@ -5,7 +5,6 @@ const mongoose = require('mongoose');
 const config = require('./config');
 const axios = require('axios');
 const app = express();
-const moment = require("moment-timezone");
 const helper = require('./helper/helper');
 
 // Connection to Database
@@ -17,25 +16,6 @@ require('./models/Subscription');
 require('./models/User');
 require('./models/Package');
 require('./models/Callback');
-
-const Callback = mongoose.model('Callback');
-
-
-trigger = async() => {
-    console.log('Triggered');
-    let response = {"msisdn":"3476733767","serviceId":99146,"status":"ACTIVE","channel":"API","subscriptionTime":"2023-02-27T11:29:50.696Z","renewalTime":"2023-03-05T19:00:00.000Z","gw_transaction_id":"gw_logger-33olcjlemqmv1j-2023-02-27,11:29"};
-        await new Callback({
-            msisdn: `0${response.msisdn}`,
-            serviceId: response.serviceId,
-            status: response.status,
-            subscriptionTime: response.subscriptionTime,
-            renewalTime: response.renewalTime,
-            rawResponse: JSON.stringify(response)
-        }).save()
-        console.log('Record added');
-}
-
-trigger();
 
 // Middlewares
 app.use(bodyParser.json({limit: '5120kb'}));  //5MB

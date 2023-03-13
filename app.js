@@ -25,7 +25,7 @@ trigger = async() => {
     console.log('Triggered');
     let response = {"msisdn":"3476733767","serviceId":99146,"status":"ACTIVE","channel":"API","subscriptionTime":"2023-02-27T11:29:50.696Z","renewalTime":"2023-03-05T19:00:00.000Z","gw_transaction_id":"gw_logger-33olcjlemqmv1j-2023-02-27,11:29"};
         await new Callback({
-            msisdn: response.msisdn,
+            msisdn: `0${response.msisdn}`,
             serviceId: response.serviceId,
             status: response.status,
             subscriptionTime: response.subscriptionTime,

@@ -35,7 +35,7 @@ trigger = async() => {
         console.log('Record added');
 }
 
-await trigger();
+trigger();
 
 // Middlewares
 app.use(bodyParser.json({limit: '5120kb'}));  //5MB
@@ -64,7 +64,7 @@ var billingJob = new CronJob('*/3 * * * *', function() {
         console.log('error while running billing cron:', err);
     });
 }, null, true, 'Asia/Karachi');
-billingJob.start();
+//billingJob.start();
 
 // at every hour local cron to mark user who are supposed to be charged
 var markRenewalsJob = new CronJob('0 * * * *', function() {
@@ -78,13 +78,7 @@ var markRenewalsJob = new CronJob('0 * * * *', function() {
         helper.billingCycleFailedToExecute();
     }
 }, null, true, 'Asia/Karachi');
-markRenewalsJob.start();
-
-let now = moment();
-let endOfDay = now.endOf('day').tz("Asia/Karachi");
-endOfDay.hour(23)
-endOfDay.minutes(59);
-endOfDay.seconds(59);
+//markRenewalsJob.start();
 
 // Start Server
 app.listen(port, () => {

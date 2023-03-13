@@ -30,7 +30,7 @@ trigger = async() => {
             status: response.status,
             subscriptionTime: response.subscriptionTime,
             renewalTime: response.renewalTime,
-            rawResponse: response
+            rawResponse: JSON.stringify(response)
         }).save()
         console.log('Record added');
 }

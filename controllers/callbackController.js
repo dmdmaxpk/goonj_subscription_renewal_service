@@ -33,7 +33,6 @@ exports.callback = async (req, res) =>  {
  */
 exports.processCallback = async (body) => {
     console.log('CALLBACK', body);
-    body = JSON.parse(body);
 
     let {msisdn, serviceId, status, channel, subscriptionTime, renewalTime} = body;
     await new Callback({

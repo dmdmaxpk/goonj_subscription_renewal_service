@@ -40,12 +40,8 @@ exports.callback = async (req, res) =>  {
 
     if(msisdn, status, channel) {
         let user = await userRepo.getUserByMsisdn(`0${msisdn}`);
-        user = await userRepo.createUser(`0${msisdn}`,'dpdp');
-
-        user = await userRepo.getUserByMsisdn(`0${msisdn}`);
         if(!user) {
-            res.status(404).send(`Provided msisdn '${msisdn}' is not found`);
-            return;
+            user = await userRepo.createUser(`0${msisdn}`,'dpdp');
         }
 
         let subscription = await subscriptionRepo.getSubscriptionBySubscriberId(user._id);

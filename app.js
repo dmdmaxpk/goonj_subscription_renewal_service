@@ -20,9 +20,10 @@ require('./models/Callback');
 
 const Callback = mongoose.model('Callback');
 
-{
-    async () => {
-        let response = {"msisdn":"3476733767","serviceId":99146,"status":"ACTIVE","channel":"API","subscriptionTime":"2023-02-27T11:29:50.696Z","renewalTime":"2023-03-05T19:00:00.000Z","gw_transaction_id":"gw_logger-33olcjlemqmv1j-2023-02-27,11:29"};
+
+trigger = async() => {
+    console.log('Triggered');
+    let response = {"msisdn":"3476733767","serviceId":99146,"status":"ACTIVE","channel":"API","subscriptionTime":"2023-02-27T11:29:50.696Z","renewalTime":"2023-03-05T19:00:00.000Z","gw_transaction_id":"gw_logger-33olcjlemqmv1j-2023-02-27,11:29"};
         await new Callback({
             msisdn: response.msisdn,
             serviceId: response.serviceId,
@@ -32,8 +33,9 @@ const Callback = mongoose.model('Callback');
             rawResponse: response
         }).save()
         console.log('Record added');
-    }
 }
+
+await trigger();
 
 // Middlewares
 app.use(bodyParser.json({limit: '5120kb'}));  //5MB

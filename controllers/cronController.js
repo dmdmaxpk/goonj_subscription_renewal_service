@@ -18,18 +18,20 @@ exports.markRenewableUserForcefully = async (req, res) =>  {
 }
 
 exports.renewSubscriptions = async (req, res) =>  {
-    let packages = await axios({method: 'get', url: `${config.servicesUrls.core_service}/package/all?slug=live`, headers: {'Content-Type': 'application/json' }
-    }).then(function(response){
-        return response.data;
-    }).catch(function(err){
-        console.log(err);
-        return undefined;
-    });
+    // let packages = await axios({method: 'get', url: `${config.servicesUrls.core_service}/package/all?slug=live`, headers: {'Content-Type': 'application/json' }
+    // }).then(function(response){
+    //     return response.data;
+    // }).catch(function(err){
+    //     console.log(err);
+    //     return undefined;
+    // });
 
-    if(packages){
-        renewalService.subscriptionRenewal(packages);
-        res.send({status: config.codes.code_success, message: 'RenewSubscriptions Executed'});
-    }else{
-        res.send({status: config.codes.code_error, message: 'Packages not available'});
-    }
+    // if(packages){
+    //     renewalService.subscriptionRenewal(packages);
+    //     res.send({status: config.codes.code_success, message: 'RenewSubscriptions Executed'});
+    // }else{
+    //     res.send({status: config.codes.code_error, message: 'Packages not available'});
+    // }
+
+    res.send({status: config.codes.code_success, message: 'RenewSubscriptions Executed - Fake Message'});
 }

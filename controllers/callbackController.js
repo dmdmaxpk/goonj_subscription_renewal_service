@@ -75,9 +75,9 @@ exports.processCallback = async (body) => {
 
         // its a renewal callback
         if(channel === 'SYSTEM') {
-            await updateSubscription(user, package, subscription, status, req.body, channel);
+            await updateSubscription(user, package, subscription, status, body, channel);
         }else{
-            await updateSubscription(user, package, subscription, status, req.body, channel);
+            await updateSubscription(user, package, subscription, status, body, channel);
         }
         return; 
     }else{

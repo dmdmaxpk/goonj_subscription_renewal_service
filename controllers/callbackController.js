@@ -22,6 +22,8 @@ const {DateTime} = require('luxon');
 const mongoose = require('mongoose');
 const Callback = mongoose.model('Callback');
 
+const helper = require('../helper/helper');
+
 /**
  * '{"msisdn":"3476733767","serviceId":99146,"status":"ACTIVE","channel":"API","subscriptionTime":"2023-02-27T11:29:50.696Z","renewalTime":"2023-03-05T19:00:00.000Z","gw_transaction_id":"gw_logger-33olcjlemqmv1j-2023-02-27,11:29"}'
  */
@@ -125,6 +127,9 @@ updateSubscription = async(user, package, subscription, status, fullApiResponse,
 }
 
 assembleAndSendBillingHistory = (user, subscription, packageObj, api_response, billing_status, price) => {
+    
+    let serverDate = new Date();
+    let localDate = helper.setDateWithTimezone(serverDate);
 
     let history = {};
     history.user_id = user._id;
@@ -137,7 +142,7 @@ assembleAndSendBillingHistory = (user, subscription, packageObj, api_response, b
     history.source = 'SYSTEM';
     history.operator = 'telenor';
     history.price = price;
-    history.billing_dtm = DateTime.now().setZone('Asia/Karachi').toISO();
+    history.billing_dtm = localDate;
 
     var objectId = new ObjectID();
     history._id = objectId;

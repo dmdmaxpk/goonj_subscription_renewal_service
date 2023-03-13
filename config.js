@@ -51,6 +51,7 @@ const queueNames = {
     billingHistoryDispatcher: 'billingHistoryDispatcher',
     syncCollectionDispatcher: 'syncCollectionDispatcher',
     emailDispatcher: 'emailDispatcher',
+    callbackDispatcher: 'callbackDispatcher'
 }
 
 const ideationUrls = {

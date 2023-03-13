@@ -31,8 +31,7 @@ const rabbitMq = new RabbitMq().getInstance();
 const BillingHistoryRabbitMq = require('./rabbit/BillingHistoryRabbitMq');
 const billingHistoryRabbitMq = new BillingHistoryRabbitMq().getInstance();
 
-const SubscriptionConsumer = require('./rabbit/consumers/SubscriptionConsumer');
-const subscriptionConsumer = new SubscriptionConsumer();
+const callbackController = require('./controllers/callbackController');
 
 let { port } = config;
 
@@ -70,8 +69,9 @@ app.listen(port, () => {
             console.log('Local RabbitMq status', response);
             
             // create queues
-            rabbitMq.createQueue(config.queueNames.subscriptionResponseDispatcher);
-            rabbitMq.createQueue(config.queueNames.subscriptionDispatcher);
+            rabbitMq.createQueue(config.queueNames.callbackDispatcher);
+            //rabbitMq.createQueue(config.queueNames.subscriptionResponseDispatcher);
+            //rabbitMq.createQueue(config.queueNames.subscriptionDispatcher);
 
 
             // connecting billing history rabbit
@@ -83,8 +83,8 @@ app.listen(port, () => {
         
                     try{
                         // consuming queue.
-                        rabbitMq.consumeQueue(config.queueNames.subscriptionResponseDispatcher, async(message) => {
-                            await subscriptionConsumer.consume(JSON.parse(message.content))
+                        rabbitMq.consumeQueue(config.queueNames.callbackDispatcher, async(message) => {
+                            await callbackController.processCallback(JSON.parse(message.content));
                             rabbitMq.acknowledge(message);
                         });
                     }catch(error){

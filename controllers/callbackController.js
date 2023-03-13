@@ -21,14 +21,21 @@ const {DateTime} = require('luxon');
 
 const mongoose = require('mongoose');
 const Callback = mongoose.model('Callback');
-
 const helper = require('../helper/helper');
+
+exports.callback = async (req, res) =>  {
+    localRabbitMq.addInQueue(config.queueNames.callbackDispatcher, req.body);
+    res.status(200).send({status: 'OK', gw_transaction_id: req.body.gw_transaction_id}); 
+}
 
 /**
  * '{"msisdn":"3476733767","serviceId":99146,"status":"ACTIVE","channel":"API","subscriptionTime":"2023-02-27T11:29:50.696Z","renewalTime":"2023-03-05T19:00:00.000Z","gw_transaction_id":"gw_logger-33olcjlemqmv1j-2023-02-27,11:29"}'
  */
-exports.callback = async (req, res) =>  {
-    let {msisdn, serviceId, status, channel, gw_transaction_id, subscriptionTime, renewalTime} = req.body;
+exports.processCallback = async (body) => {
+    console.log('CALLBACK', body);
+    body = JSON.parse(body);
+
+    let {msisdn, serviceId, status, channel, subscriptionTime, renewalTime} = body;
     await new Callback({
         msisdn: `0${msisdn}`,
         serviceId: serviceId,
@@ -36,9 +43,7 @@ exports.callback = async (req, res) =>  {
         subscriptionTime: subscriptionTime,
         renewalTime: renewalTime,
         rawResponse: JSON.stringify(req.body)
-    }).save()
-        
-    console.log('CALLBACK', JSON.stringify(req.body));
+    }).save();
 
     if(msisdn, status, channel) {
         let user = await userRepo.getUserByMsisdn(`0${msisdn}`);
@@ -75,9 +80,10 @@ exports.callback = async (req, res) =>  {
         }else{
             await updateSubscription(user, package, subscription, status, req.body, channel);
         }
-        res.status(200).send({status: 'OK', gw_transaction_id: gw_transaction_id}); 
+        return; 
     }else{
-        res.status(400).send(`Bad request, please send all the required parameters i.e 'msisdn', 'status', 'channel'`); 
+        console.log(`Bad request, please send all the required parameters i.e 'msisdn', 'status', 'channel'`);
+        return; 
     }
 }
 

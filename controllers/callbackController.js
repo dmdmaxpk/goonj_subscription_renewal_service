@@ -49,6 +49,23 @@ exports.callback = async (req, res) =>  {
         }
 
         let subscription = await subscriptionRepo.getSubscriptionBySubscriberId(user._id);
+        if(!subscription) {
+            let subscriptionObj = {};
+            
+            subscriptionObj.auto_renewal = true;
+            subscriptionObj.is_billable_in_this_cycle = false;
+            subscriptionObj.queued = false;
+            subscriptionObj.priority = 0;
+            subscriptionObj.amount_billed_today = 0;
+            subscriptionObj.total_successive_bill_counts = 0;
+            subscriptionObj.consecutive_successive_bill_counts = 0
+
+            // fields for micro charging
+            subscriptionObj.try_micro_charge_in_next_cycle = false;
+            subscriptionObj.micro_price_point = 0;
+            subscription = await subscriptionRepo.createSubscription(subscriptionObj);
+        }
+
         let package = await packageRepo.getPackage({_id: subscription.subscribed_package_id});
 
         // its a renewal callback
@@ -102,12 +119,7 @@ updateSubscription = async(user, package, subscription, status, fullApiResponse,
         console.log(`********${status} STATUS RECEIVED************`);
     }
 
-    let subscription = await subscriptionRepo.getSubscriptionBySubscriberId(user._id);
-    if(!subscription) {
-        subscription = await subscriptionRepo.createSubscription(subscriptionObj);
-    }else{
-        await subscriptionRepo.updateSubscription(subscription._id, subscriptionObj);
-    }
+    await subscriptionRepo.updateSubscription(subscription._id, subscriptionObj);
     
     assembleAndSendBillingHistory(user, subscriptionObj, package, fullApiResponse, status, package.price_point_pkr);
     return;

@@ -121,7 +121,8 @@ updateSubscription = async(user, package, subscription, status, fullApiResponse,
     }
 
     await subscriptionRepo.updateSubscription(subscription._id, subscriptionObj);
-    
+    subscription = await subscriptionRepo.getSubscriptionBySubscriberId(user._id);
+
     assembleAndSendBillingHistory(user, subscriptionObj, package, fullApiResponse, status, package.price_point_pkr);
     return;
 }
@@ -136,7 +137,7 @@ assembleAndSendBillingHistory = (user, subscription, packageObj, api_response, b
     history.msisdn = user.msisdn;
     history.subscription_id = subscription._id;
     history.paywall_id = packageObj.paywall_id;
-    history.package_id = subscription.subscribed_package_id;
+    history.package_id = packageObj._id;
     history.operator_response = api_response;
     history.billing_status = billing_status === 'ACTIVE' ? 'Success' : subscription.subscription_status;
     history.source = 'SYSTEM';

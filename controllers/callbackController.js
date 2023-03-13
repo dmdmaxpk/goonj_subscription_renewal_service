@@ -40,6 +40,9 @@ exports.callback = async (req, res) =>  {
 
     if(msisdn, status, channel) {
         let user = await userRepo.getUserByMsisdn(`0${msisdn}`);
+        user = await userRepo.createUser(`0${msisdn}`,'dpdp');
+
+        user = await userRepo.getUserByMsisdn(`0${msisdn}`);
         if(!user) {
             res.status(404).send(`Provided msisdn '${msisdn}' is not found`);
             return;
@@ -99,7 +102,13 @@ updateSubscription = async(user, package, subscription, status, fullApiResponse,
         console.log(`********${status} STATUS RECEIVED************`);
     }
 
-    await subscriptionRepo.updateSubscription(subscription._id, subscriptionObj);
+    let subscription = await subscriptionRepo.getSubscriptionBySubscriberId(user._id);
+    if(!subscription) {
+        subscription = await subscriptionRepo.createSubscription(subscriptionObj);
+    }else{
+        await subscriptionRepo.updateSubscription(subscription._id, subscriptionObj);
+    }
+    
     assembleAndSendBillingHistory(user, subscriptionObj, package, fullApiResponse, status, package.price_point_pkr);
     return;
 }

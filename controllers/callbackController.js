@@ -53,7 +53,6 @@ exports.callback = async (req, res) =>  {
             await updateSubscription(user, package, subscription, status, req.body, channel);
         }else{
             await updateSubscription(user, package, subscription, status, req.body, channel);
-            sendMessage(`0${msisdn}`, 'You have been subscribed to Goonj successfully. Thank you');
         }
         res.status(200).send({status: 'OK', gw_transaction_id: gw_transaction_id}); 
     }else{

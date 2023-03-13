@@ -68,11 +68,6 @@ updateSubscription = async(user, package, subscription, status, fullApiResponse,
     subscriptionObj.auto_renewal = true;
     subscriptionObj.is_billable_in_this_cycle = false;
     subscriptionObj.queued = false;
-    subscriptionObj.last_billing_timestamp = DateTime.now().setZone('Asia/Karachi').toISO();
-    subscriptionObj.next_billing_timestamp = DateTime.now().setZone('Asia/Karachi').plus({hour:package.package_duration}).toISO();
-    subscriptionObj.amount_billed_today = subscription.amount_billed_today + package.price_point_pkr;
-    subscriptionObj.total_successive_bill_counts = ((subscription.total_successive_bill_counts ? subscription.total_successive_bill_counts : 0) + 1);
-    subscriptionObj.consecutive_successive_bill_counts = ((subscription.consecutive_successive_bill_counts ? subscription.consecutive_successive_bill_counts : 0) + 1);
     subscriptionObj.priority = 0;
 
     // fields for micro charging
@@ -80,14 +75,23 @@ updateSubscription = async(user, package, subscription, status, fullApiResponse,
     subscriptionObj.micro_price_point = 0;
     
     if(status === 'ACTIVE'){ 
+        subscriptionObj.last_billing_timestamp = DateTime.now().setZone('Asia/Karachi').toISO();
+        subscriptionObj.next_billing_timestamp = DateTime.now().setZone('Asia/Karachi').plus({hour:package.package_duration}).toISO();    
+        subscriptionObj.amount_billed_today = subscription.amount_billed_today + package.price_point_pkr;
+        subscriptionObj.total_successive_bill_counts = ((subscription.total_successive_bill_counts ? subscription.total_successive_bill_counts : 0) + 1);
+        subscriptionObj.consecutive_successive_bill_counts = ((subscription.consecutive_successive_bill_counts ? subscription.consecutive_successive_bill_counts : 0) + 1);
+        subscriptionObj.priority = 0;
+        
         subscriptionObj.subscription_status = 'billed';
         subscriptionObj.is_allowed_to_stream = true;
 
         //if(channel === 'SYSTEM') sendRenewalMessage(subscription, user.msisdn, package._id, user._id)
     }else if(status === 'GRACE') {
+        subscriptionObj.consecutive_successive_bill_counts = 0;
         subscriptionObj.is_allowed_to_stream = false;
         subscriptionObj.subscription_status = 'graced';
     }else if(status === 'INACTIVE') {
+        subscriptionObj.consecutive_successive_bill_counts = 0;
         subscriptionObj.is_allowed_to_stream = false;
         subscriptionObj.subscription_status = 'expired';
     }else{ 
@@ -96,7 +100,7 @@ updateSubscription = async(user, package, subscription, status, fullApiResponse,
     }
 
     await subscriptionRepo.updateSubscription(subscription._id, subscriptionObj);
-    assembleAndSendBillingHistory(user, subscription, package, fullApiResponse, status, package.price_point_pkr);
+    assembleAndSendBillingHistory(user, subscriptionObj, package, fullApiResponse, status, package.price_point_pkr);
     return;
 }
 
@@ -109,7 +113,7 @@ assembleAndSendBillingHistory = (user, subscription, packageObj, api_response, b
     history.paywall_id = packageObj.paywall_id;
     history.package_id = subscription.subscribed_package_id;
     history.operator_response = api_response;
-    history.billing_status = billing_status === 'ACTIVE' ? 'Success' : billing_status;
+    history.billing_status = billing_status === 'ACTIVE' ? 'Success' : subscription.subscription_status;
     history.source = 'SYSTEM';
     history.operator = 'telenor';
     history.price = price;

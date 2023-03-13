@@ -41,7 +41,7 @@ exports.processCallback = async (body) => {
         status: status,
         subscriptionTime: subscriptionTime,
         renewalTime: renewalTime,
-        rawResponse: JSON.stringify(req.body)
+        rawResponse: JSON.stringify(body)
     }).save();
 
     if(msisdn, status, channel) {

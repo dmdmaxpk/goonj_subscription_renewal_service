@@ -117,7 +117,7 @@ updateSubscription = async(user, package, subscription, status, fullApiResponse,
         subscriptionObj.subscription_status = 'expired';
     }else{ 
         // PRE_ACTIVE
-        console.log(`********${status} STATUS RECEIVED************`);
+        //console.log(`********${status} STATUS RECEIVED************`);
     }
 
     await subscriptionRepo.updateSubscription(subscription._id, subscriptionObj);
@@ -169,7 +169,7 @@ sendRenewalMessage = (subscription, msisdn, package_id, user_id) => {
 }
 
 sendHistory = (history) => {
-    console.log('$$:',JSON.stringify(history),':$$');
+    //console.log('$$:',JSON.stringify(history),':$$');
     rabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
     localRabbitMq.addInQueue(config.queueNames.billingHistoryDispatcher, history);
 }

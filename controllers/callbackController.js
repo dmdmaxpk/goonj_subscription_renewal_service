@@ -84,7 +84,7 @@ updateSubscription = async(user, package, subscription, status, fullApiResponse,
         subscriptionObj.subscription_status = 'billed';
         subscriptionObj.is_allowed_to_stream = true;
 
-        if(channel === 'SYSTEM') sendRenewalMessage(subscription, user.msisdn, package._id, user._id)
+        //if(channel === 'SYSTEM') sendRenewalMessage(subscription, user.msisdn, package._id, user._id)
     }else if(status === 'GRACE') {
         subscriptionObj.is_allowed_to_stream = false;
         subscriptionObj.subscription_status = 'graced';
@@ -119,7 +119,7 @@ assembleAndSendBillingHistory = (user, subscription, packageObj, api_response, b
     var objectId = new ObjectID();
     history._id = objectId;
 
-    //sendHistory(history);
+    sendHistory(history);
 }
 
 sendRenewalMessage = (subscription, msisdn, package_id, user_id) => {

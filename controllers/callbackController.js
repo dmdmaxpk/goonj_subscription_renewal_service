@@ -46,8 +46,11 @@ exports.callback = async (req, res) =>  {
 
         let subscription = await subscriptionRepo.getSubscriptionBySubscriberId(user._id);
         if(!subscription) {
+            let package = await packageRepo.getPackageByServiceId(serviceId);
             let subscriptionObj = {};
-            
+            subscriptionObj.subscribed_package_id = package._id;
+            subscriptionObj.user_id = user._id;
+            subscriptionObj.paywall_id = package.paywall_id;
             subscriptionObj.auto_renewal = true;
             subscriptionObj.is_billable_in_this_cycle = false;
             subscriptionObj.queued = false;

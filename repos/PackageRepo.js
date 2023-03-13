@@ -20,6 +20,10 @@ class PackageRepository {
         }
         return undefined;
     }
+
+    async getPackageByServiceId(serviceId) {
+        return await Package.findOne({pid: serviceId});
+    }
     
     async getAllPackages(query) {
         query.active = true;

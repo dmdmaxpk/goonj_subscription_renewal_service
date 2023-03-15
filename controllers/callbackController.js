@@ -24,7 +24,7 @@ const Callback = mongoose.model('Callback');
 const helper = require('../helper/helper');
 
 exports.callback = async (req, res) =>  {
-
+    console.log(req.body);
     if(req.body.channel === 'SYSTEM') {
         console.log(`*** RENEWAL CALLBACK ***`);
         // renewal callback

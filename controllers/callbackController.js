@@ -24,8 +24,26 @@ const Callback = mongoose.model('Callback');
 const helper = require('../helper/helper');
 
 exports.callback = async (req, res) =>  {
-    localRabbitMq.addInQueue(config.queueNames.callbackDispatcher, req.body);
-    res.status(200).send({status: 'OK', gw_transaction_id: req.body.gw_transaction_id}); 
+    if(req.body.channel === 'SYSTEM') {
+        // renewal callback
+        localRabbitMq.addInQueue(config.queueNames.callbackDispatcher, req.body);
+        res.status(200).send({status: 'OK', gw_transaction_id: req.body.gw_transaction_id}); 
+        return;
+    }else{
+        // activation callback
+        let {status} = req.body;
+        console.log(`*** ${status} ***`);
+
+        let subscription = await subscriptionRepo.getSubscriptionBySubscriberId(user._id);
+        if(!subscription) {
+            console.log('Subscription does not exist: ' + user.msisdn);
+            return;
+        }
+
+        let package = await packageRepo.getPackage({_id: subscription.subscribed_package_id});
+        await updateSubscriptionRecord(user, package, subscription, status, req.body);
+    }
+    
 }
 
 /**
@@ -34,7 +52,7 @@ exports.callback = async (req, res) =>  {
 exports.processCallback = async (body) => {
     console.log('CALLBACK', body);
 
-    let {msisdn, serviceId, status, channel, subscriptionTime, renewalTime} = body;
+    let {msisdn, serviceId, status, subscriptionTime, renewalTime} = body;
     await new Callback({
         msisdn: `0${msisdn}`,
         serviceId: serviceId,
@@ -44,7 +62,7 @@ exports.processCallback = async (body) => {
         rawResponse: JSON.stringify(body)
     }).save();
 
-    if(msisdn, status, channel) {
+    if(msisdn, status) {
         let user = await userRepo.getUserByMsisdn(`0${msisdn}`);
         if(!user) {
             user = await userRepo.createUser(`0${msisdn}`,'dpdp');
@@ -52,41 +70,20 @@ exports.processCallback = async (body) => {
 
         let subscription = await subscriptionRepo.getSubscriptionBySubscriberId(user._id);
         if(!subscription) {
-            let package = await packageRepo.getPackageByServiceId(`${serviceId}`);
-            let subscriptionObj = {};
-            subscriptionObj.subscribed_package_id = package._id;
-            subscriptionObj.user_id = user._id;
-            subscriptionObj.paywall_id = package.paywall_id;
-            subscriptionObj.auto_renewal = true;
-            subscriptionObj.is_billable_in_this_cycle = false;
-            subscriptionObj.queued = false;
-            subscriptionObj.priority = 0;
-            subscriptionObj.amount_billed_today = 0;
-            subscriptionObj.total_successive_bill_counts = 0;
-            subscriptionObj.consecutive_successive_bill_counts = 0
-
-            // fields for micro charging
-            subscriptionObj.try_micro_charge_in_next_cycle = false;
-            subscriptionObj.micro_price_point = 0;
-            subscription = await subscriptionRepo.createSubscription(subscriptionObj);
+            console.log('Subscription does not exist: ' + user.msisdn);
+            return;
         }
 
         let package = await packageRepo.getPackage({_id: subscription.subscribed_package_id});
-
-        // its a renewal callback
-        if(channel === 'SYSTEM') {
-            await updateSubscription(user, package, subscription, status, body, channel);
-        }else{
-            await updateSubscription(user, package, subscription, status, body, channel);
-        }
+        await updateSubscriptionRecord(user, package, subscription, status, body);
         return; 
     }else{
-        console.log(`Bad request, please send all the required parameters i.e 'msisdn', 'status', 'channel'`);
+        console.log(`Bad request, please send all the required parameters i.e 'msisdn', 'status'`);
         return; 
     }
 }
 
-updateSubscription = async(user, package, subscription, status, fullApiResponse, channel) => {
+updateSubscriptionRecord = async(user, package, subscription, status, fullApiResponse) => {
     
     // update subscription
     let subscriptionObj = {};
@@ -99,7 +96,7 @@ updateSubscription = async(user, package, subscription, status, fullApiResponse,
     // fields for micro charging
     subscriptionObj.try_micro_charge_in_next_cycle = false;
     subscriptionObj.micro_price_point = 0;
-    
+
     if(status === 'ACTIVE'){ 
         subscriptionObj.last_billing_timestamp = DateTime.now().setZone('Asia/Karachi').toISO();
         subscriptionObj.next_billing_timestamp = DateTime.now().setZone('Asia/Karachi').plus({hour:package.package_duration}).toISO();    
@@ -110,8 +107,6 @@ updateSubscription = async(user, package, subscription, status, fullApiResponse,
         
         subscriptionObj.subscription_status = 'billed';
         subscriptionObj.is_allowed_to_stream = true;
-
-        //if(channel === 'SYSTEM') sendRenewalMessage(subscription, user.msisdn, package._id, user._id)
     }else if(status === 'GRACE') {
         subscriptionObj.consecutive_successive_bill_counts = 0;
         subscriptionObj.is_allowed_to_stream = false;
@@ -122,13 +117,16 @@ updateSubscription = async(user, package, subscription, status, fullApiResponse,
         subscriptionObj.subscription_status = 'expired';
     }else{ 
         // PRE_ACTIVE
-        //console.log(`********${status} STATUS RECEIVED************`);
+        subscriptionObj.next_billing_timestamp = DateTime.now().setZone('Asia/Karachi').plus({hour:package.package_duration}).toISO();    
+        subscriptionObj.consecutive_successive_bill_counts = 0;
+        subscriptionObj.is_allowed_to_stream = true;
+        subscriptionObj.subscription_status = 'trial';
     }
 
     await subscriptionRepo.updateSubscription(subscription._id, subscriptionObj);
     subscription = await subscriptionRepo.getSubscriptionBySubscriberId(user._id);
 
-    assembleAndSendBillingHistory(user, subscriptionObj, package, fullApiResponse, status, package.price_point_pkr);
+    assembleAndSendBillingHistory(user, subscription, package, fullApiResponse, status, package.price_point_pkr);
     return;
 }
 

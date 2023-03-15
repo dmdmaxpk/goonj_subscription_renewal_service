@@ -24,7 +24,7 @@ const Callback = mongoose.model('Callback');
 const helper = require('../helper/helper');
 
 exports.callback = async (req, res) =>  {
-    console.log(req.body);
+    console.log(req.body.channel);
     if(req.body.channel === 'SYSTEM') {
         console.log(`*** RENEWAL CALLBACK ***`);
         // renewal callback
@@ -32,24 +32,28 @@ exports.callback = async (req, res) =>  {
         res.status(200).send({status: 'OK', gw_transaction_id: req.body.gw_transaction_id}); 
         return;
     }else{
-        // activation callback
-        let {msisdn, status} = req.body;
-        console.log(`*** ${status} - ${msisdn} ***`);
-        let user = await userRepo.getUserByMsisdn(`0${msisdn}`);
-        if(!user) {
-            console.log(`*** ${msisdn} does not exist ***`);
-        }
-
-        let subscription = await subscriptionRepo.getSubscriptionBySubscriberId(user._id);
-        if(!subscription) {
-            console.log('Subscription does not exist: ' + user.msisdn);
-            return;
-        }
-
-        let package = await packageRepo.getPackage({_id: subscription.subscribed_package_id});
-        await updateSubscriptionRecord(user, package, subscription, status, req.body);
+        processSubscription(req.body);
+        res.status(200).send({status: 'OK', gw_transaction_id: req.body.gw_transaction_id}); 
     }
-    
+}
+
+processSubscription = async(body) => {
+    // activation callback
+    let {msisdn, status} = body;
+    console.log(`*** ${status} - ${msisdn} ***`);
+    let user = await userRepo.getUserByMsisdn(`0${msisdn}`);
+    if(!user) {
+        console.log(`*** ${msisdn} does not exist ***`);
+    }
+
+    let subscription = await subscriptionRepo.getSubscriptionBySubscriberId(user._id);
+    if(!subscription) {
+        console.log('Subscription does not exist: ' + user.msisdn);
+        return;
+    }
+
+    let package = await packageRepo.getPackage({_id: subscription.subscribed_package_id});
+    await updateSubscriptionRecord(user, package, subscription, status, body);
 }
 
 /**

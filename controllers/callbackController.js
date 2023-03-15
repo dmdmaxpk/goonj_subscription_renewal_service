@@ -24,15 +24,21 @@ const Callback = mongoose.model('Callback');
 const helper = require('../helper/helper');
 
 exports.callback = async (req, res) =>  {
+
     if(req.body.channel === 'SYSTEM') {
+        console.log(`*** RENEWAL CALLBACK ***`);
         // renewal callback
         localRabbitMq.addInQueue(config.queueNames.callbackDispatcher, req.body);
         res.status(200).send({status: 'OK', gw_transaction_id: req.body.gw_transaction_id}); 
         return;
     }else{
         // activation callback
-        let {status} = req.body;
-        console.log(`*** ${status} ***`);
+        let {msisdn, status} = req.body;
+        console.log(`*** ${status} - ${msisdn} ***`);
+        let user = await userRepo.getUserByMsisdn(`0${msisdn}`);
+        if(!user) {
+            console.log(`*** ${msisdn} does not exist ***`);
+        }
 
         let subscription = await subscriptionRepo.getSubscriptionBySubscriberId(user._id);
         if(!subscription) {

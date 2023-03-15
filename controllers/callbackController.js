@@ -25,7 +25,6 @@ const helper = require('../helper/helper');
 
 exports.callback = async (req, res) =>  {
     if(req.body.channel === 'SYSTEM') {
-        console.log(`*** RENEWAL CALLBACK ***`);
         // renewal callback
         localRabbitMq.addInQueue(config.queueNames.callbackDispatcher, req.body);
         res.status(200).send({status: 'OK', gw_transaction_id: req.body.gw_transaction_id}); 
@@ -59,8 +58,7 @@ processSubscription = async(body) => {
  * '{"msisdn":"3476733767","serviceId":99146,"status":"ACTIVE","channel":"API","subscriptionTime":"2023-02-27T11:29:50.696Z","renewalTime":"2023-03-05T19:00:00.000Z","gw_transaction_id":"gw_logger-33olcjlemqmv1j-2023-02-27,11:29"}'
  */
 exports.processCallback = async (body) => {
-    console.log('CALLBACK', body);
-
+    
     let {msisdn, serviceId, status, subscriptionTime, renewalTime} = body;
     await new Callback({
         msisdn: `0${msisdn}`,

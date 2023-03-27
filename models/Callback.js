@@ -12,7 +12,8 @@ const callbackSchema = new Schema({
     status: {type: String, index: true},
     subscriptionTime: {type: Date, index: true},
     renewalTime: {type: Date, index: true},
-    rawResponse: {type: String}
+    rawResponse: {type: String},
+    added_dtm: { type: Date, default: Date.now, index: true }
 }, { strict: true });
 
 module.exports = mongoose.model('Callback', callbackSchema);

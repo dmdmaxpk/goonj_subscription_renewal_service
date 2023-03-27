@@ -27,12 +27,25 @@ exports.callback = async (req, res) =>  {
     if(req.body.channel === 'SYSTEM') {
         // renewal callback
         localRabbitMq.addInQueue(config.queueNames.callbackDispatcher, req.body);
+        addCallbackRecord(req.body);
         res.status(200).send({status: 'OK', gw_transaction_id: req.body.gw_transaction_id}); 
         return;
     }else{
         processSubscription(req.body);
         res.status(200).send({status: 'OK', gw_transaction_id: req.body.gw_transaction_id}); 
     }
+}
+
+addCallbackRecord = async (body) => {
+    let {msisdn, serviceId, status, subscriptionTime, renewalTime} = body;
+    await new Callback({
+        msisdn: `0${msisdn}`,
+        serviceId: serviceId,
+        status: status,
+        subscriptionTime: subscriptionTime,
+        renewalTime: renewalTime,
+        rawResponse: JSON.stringify(body)
+    }).save();
 }
 
 processSubscription = async(body) => {

@@ -27,12 +27,12 @@ exports.callback = async (req, res) =>  {
     if(req.body.channel === 'SYSTEM') {
         // renewal callback
         localRabbitMq.addInQueue(config.queueNames.callbackDispatcher, req.body);
-        addCallbackRecord(req.body);
         res.status(200).send({status: 'OK', gw_transaction_id: req.body.gw_transaction_id}); 
         return;
     }else{
         processSubscription(req.body);
         res.status(200).send({status: 'OK', gw_transaction_id: req.body.gw_transaction_id}); 
+        return;
     }
 }
 
@@ -49,22 +49,46 @@ addCallbackRecord = async (body) => {
 }
 
 processSubscription = async(body) => {
-    // activation callback
-    let {msisdn, status} = body;
+    
+    let {msisdn, serviceId, status, subscriptionTime, renewalTime} = body;
+    await new Callback({
+        msisdn: `0${msisdn}`,
+        serviceId: serviceId,
+        status: status,
+        subscriptionTime: subscriptionTime,
+        renewalTime: renewalTime,
+        rawResponse: JSON.stringify(body)
+    }).save();
+
     console.log(`*** ${status} - ${msisdn} ***`);
     let user = await userRepo.getUserByMsisdn(`0${msisdn}`);
     if(!user) {
-        console.log(`*** ${msisdn} does not exist ***`);
+        user = await userRepo.createUser(`0${msisdn}`,'dpdp');
+        console.log('new user created', user);
     }
 
     let subscription = await subscriptionRepo.getSubscriptionBySubscriberId(user._id);
     if(!subscription) {
-        console.log('Subscription does not exist: ' + user.msisdn);
+        let internalPackage = await packageRepo.getPackageByServiceId(serviceId);
+        let postSubscription = {
+            user_id: user._id,
+            paywall_id: internalPackage.paywall_id,
+            subscribed_package_id: internalPackage._id,
+            subscription_status: status === 'ACTIVE' ? 'billed' : (status === 'PRE_ACTIVE' ? 'trial' : 'expired'),
+            source: 'dpdp',
+            is_allowed_to_stream: true,
+            payment_source: 'telenor',
+            next_billing_timestamp: new Date(renewalTime)
+        }
+
+        subscription = await subscriptionRepo.createSubscription(postSubscription);
+        console.log('new subscription created', subscription);
         return;
     }
 
     let package = await packageRepo.getPackage({_id: subscription.subscribed_package_id});
     await updateSubscriptionRecord(user, package, subscription, status, body);
+    return;
 }
 
 /**

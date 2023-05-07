@@ -83,6 +83,9 @@ processSubscription = async(body) => {
 
         subscription = await subscriptionRepo.createSubscription(postSubscription);
         console.log('new subscription created', subscription);
+        
+        assembleAndSendBillingHistory(user, subscription, internalPackage, body, status, internalPackage.price_point_pkr);
+
         return;
     }
 

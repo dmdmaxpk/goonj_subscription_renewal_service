@@ -69,6 +69,7 @@ processSubscription = async(body) => {
 
     let subscription = await subscriptionRepo.getSubscriptionBySubscriberId(user._id);
     if(!subscription) {
+        console.log('Service Id: ' + serviceId);
         let internalPackage = await packageRepo.getPackageByServiceId(serviceId);
         let postSubscription = {
             user_id: user._id,

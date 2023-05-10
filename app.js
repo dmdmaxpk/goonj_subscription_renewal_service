@@ -38,9 +38,6 @@ let { port } = config;
 // Start Server
 app.listen(port, () => {
     console.log(`Subscription Renewal Service Running On Port ${port}`);
-    let PackageRepository = require('./repos/PackageRepo');
-    let packageRepo = new PackageRepository()
-    console.log(await packageRepo.getPackageByServiceId('99146'));
     rabbitMq.initServer((error, response) => {
         if(error){
             console.log(error)
@@ -63,6 +60,10 @@ app.listen(port, () => {
                     try{
                         // consuming queue.
                         rabbitMq.consumeQueue(config.queueNames.callbackDispatcher, async(message) => {
+                            let PackageRepository = require('./repos/PackageRepo');
+                            let packageRepo = new PackageRepository()
+                            console.log(await packageRepo.getPackageByServiceId('99146'));
+
                             await callbackController.processCallback(JSON.parse(message.content));
                             rabbitMq.acknowledge(message);
                         });

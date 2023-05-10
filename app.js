@@ -35,39 +35,18 @@ const callbackController = require('./controllers/callbackController');
 
 let { port } = config;
 
-// at every 3 minutes local cron to trigger billing
-var CronJob = require('cron').CronJob;
-var billingJob = new CronJob('*/3 * * * *', function() {
-    axios.get(`http://localhost:${port}/cron/renewSubscriptions`).then(res => {
-    }).catch(err =>{
-        console.log('error while running billing cron:', err);
-    });
-}, null, true, 'Asia/Karachi');
-//billingJob.start();
-
-// at every hour local cron to mark user who are supposed to be charged
-var markRenewalsJob = new CronJob('0 * * * *', function() {
-    try{
-        axios.get(`http://localhost:${port}/cron/markRenewableUsers`).then(res => {
-        }).catch(err =>{
-            helper.billingCycleFailedToExecute();
-            console.log('error while running mark renewal cron:', err);
-        });
-    }catch(e){
-        helper.billingCycleFailedToExecute();
-    }
-}, null, true, 'Asia/Karachi');
-//markRenewalsJob.start();
-
 // Start Server
 app.listen(port, () => {
     console.log(`Subscription Renewal Service Running On Port ${port}`);
+    let PackageRepository = require('./repos/PackageRepo');
+    let packageRepo = new PackageRepository()
+    console.log(packageRepo.getPackageByServiceId('99146'));
     rabbitMq.initServer((error, response) => {
         if(error){
             console.log(error)
         }else{
             console.log('Local RabbitMq status', response);
-            
+
             // create queues
             rabbitMq.createQueue(config.queueNames.callbackDispatcher);
             //rabbitMq.createQueue(config.queueNames.subscriptionResponseDispatcher);

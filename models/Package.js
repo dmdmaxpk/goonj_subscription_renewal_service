@@ -34,6 +34,9 @@ const packageSchema = new Schema({
     subscription_message_text: {type: String},
 
     new_partner_id: {type: Array},
+
+    pid: {type: String},
+    trial_pid: {type: String}
 }, { strict: true });
 
 module.exports = mongoose.model('Package', packageSchema);

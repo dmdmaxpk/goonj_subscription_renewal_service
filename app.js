@@ -40,7 +40,7 @@ app.listen(port, () => {
     console.log(`Subscription Renewal Service Running On Port ${port}`);
     let PackageRepository = require('./repos/PackageRepo');
     let packageRepo = new PackageRepository()
-    console.log(packageRepo.getPackageByServiceId('99146'));
+    console.log(await packageRepo.getPackageByServiceId('99146'));
     rabbitMq.initServer((error, response) => {
         if(error){
             console.log(error)

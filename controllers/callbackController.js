@@ -90,8 +90,8 @@ processSubscription = async(body) => {
         return;
     }
 
-    let package = await packageRepo.getPackage({_id: subscription.subscribed_package_id});
-    await updateSubscriptionRecord(user, package, subscription, status, body);
+    let internalPackage = await packageRepo.getPackageByServiceId(serviceId);
+    await updateSubscriptionRecord(user, internalPackage, subscription, status, body);
     return;
 }
 
@@ -140,6 +140,7 @@ updateSubscriptionRecord = async(user, package, subscription, status, fullApiRes
     subscriptionObj.is_billable_in_this_cycle = false;
     subscriptionObj.queued = false;
     subscriptionObj.priority = 0;
+    subscriptionObj.subscribed_package_id = package._id;
 
     // fields for micro charging
     subscriptionObj.try_micro_charge_in_next_cycle = false;

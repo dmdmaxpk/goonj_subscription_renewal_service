@@ -1,6 +1,6 @@
 let userRepo = require('../repos/UserRepo');
 
-let CampaignRepository = require('../repos/CampaignRepository');
+let CampaignRepository = require('../repos/CampaignRepo');
 let campaignRepo = new CampaignRepository();
 
 let SubscriptionRepository = require('../repos/SubscriptionRepository');

@@ -1,5 +1,8 @@
 let userRepo = require('../repos/UserRepo');
 
+let CampaignRepository = require('../repos/CampaignRepository');
+let campaignRepo = new CampaignRepository();
+
 let SubscriptionRepository = require('../repos/SubscriptionRepository');
 let subscriptionRepo = new SubscriptionRepository();
 
@@ -67,6 +70,8 @@ processSubscription = async(body) => {
         console.log('new user created', user);
     }
 
+    let campaign = await campaignRepo.getCampaign(`0${msisdn}`);
+
     let subscription = await subscriptionRepo.getSubscriptionBySubscriberId(user._id);
     if(!subscription) {
         console.log('Service Id: ' + serviceId);
@@ -82,10 +87,30 @@ processSubscription = async(body) => {
             next_billing_timestamp: new Date(renewalTime)
         }
 
+        if(campaign) {
+            console.log('######CAMPAIGN FOUND########')
+            postSubscription.marketing_source = campaign.marketing_source;
+            postSubscription.affiliate_unique_transaction_id = campaign.affiliate_tid;
+            postSubscription.affiliate_mid = campaign.affiliate_mid;
+            postSubscription.should_affiliation_callback_sent = true;
+        }
+
         subscription = await subscriptionRepo.createSubscription(postSubscription);
         console.log('new subscription created', subscription);
         
         assembleAndSendBillingHistory(user, subscription, internalPackage, body, status, internalPackage.price_point_pkr);
+        
+        console.log('######SENDING CALLBACKS IF REQUIRED########')
+        // execute callback
+        let url = 'http://localhost:3004/subscription/send-callback';
+        await axios.post(url, {
+            tid: campaign.affiliate_tid,
+            mid: campaign.affiliate_mid, 
+            msisdn: user.msisdn,
+            user_id: user._id,
+            subscription_id: subscription._id,
+            package_id: subscription.subscribed_package_id
+        });
 
         return;
     }

@@ -16,6 +16,7 @@ require('./models/Subscription');
 require('./models/User');
 require('./models/Package');
 require('./models/Callback');
+require('./models/Campaign');
 
 // Middlewares
 app.use(bodyParser.json({limit: '5120kb'}));  //5MB

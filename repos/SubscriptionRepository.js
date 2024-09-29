@@ -18,6 +18,11 @@ class SubscriptionRepository {
         }
     }
 
+    async isExist(userId, paywallId) {
+        let result = await this.getSubscriptionByPaywallId(userId, paywallId);
+        return result;
+    }
+
     async getSubscription (subscription_id)  {
         let result = await Subscription.findOne({_id: subscription_id});
         return result;

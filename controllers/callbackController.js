@@ -95,25 +95,33 @@ processSubscription = async(body) => {
             postSubscription.should_affiliation_callback_sent = (status === 'ACTIVE' ? true : false);
         }
 
-        subscription = await subscriptionRepo.createSubscription(postSubscription);
-        console.log('new subscription created', subscription);
-        
-        assembleAndSendBillingHistory(user, subscription, internalPackage, body, status, internalPackage.price_point_pkr);
-        
-        if(subscription.should_affiliation_callback_sent === true) {
-            console.log('######SENDING CALLBACKS IF REQUIRED########')
-            // execute callback
-            let url = 'http://localhost:3004/subscription/send-callback';
-            await axios.post(url, {
-                tid: campaign.affiliate_tid,
-                mid: campaign.affiliate_mid, 
-                msisdn: user.msisdn,
-                user_id: user._id,
-                subscription_id: subscription._id,
-                package_id: subscription.subscribed_package_id
-            });
+        const isExist = await subscriptionRepo.isExist(postSubscription.user_id, postSubscription.paywall_id);
+        if(isExist) {
+            subscription = await subscriptionRepo.updateSubscription(isExist._id, postSubscription);
+            console.log('existing subscription updated', subscription);
+            
+            assembleAndSendBillingHistory(user, subscription, internalPackage, body, status, internalPackage.price_point_pkr);
+        }else {
+            subscription = await subscriptionRepo.createSubscription(postSubscription);
+            console.log('new subscription created', subscription);
+            
+            assembleAndSendBillingHistory(user, subscription, internalPackage, body, status, internalPackage.price_point_pkr);
+            
+            if(subscription.should_affiliation_callback_sent === true) {
+                console.log('######SENDING CALLBACKS IF REQUIRED########')
+                // execute callback
+                let url = 'http://localhost:3004/subscription/send-callback';
+                await axios.post(url, {
+                    tid: campaign.affiliate_tid,
+                    mid: campaign.affiliate_mid, 
+                    msisdn: user.msisdn,
+                    user_id: user._id,
+                    subscription_id: subscription._id,
+                    package_id: subscription.subscribed_package_id
+                });
+            }    
         }
-
+        
         return;
     }
 
